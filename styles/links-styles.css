@@ -1,0 +1,74 @@
+body {
+  background: #f5f5f5;
+  font-family: 'Helvetica Neue', sans-serif;
+  padding: 40px 20px;
+  margin: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.page-title {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 5px;
+  color: #111;
+}
+
+.tagline {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+  font-style: italic;
+}
+
+.platform-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  padding: 16px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 16px;
+  transition: transform 0.2s ease;
+}
+
+.platform-card:hover {
+  transform: translateY(-2px);
+}
+
+.platform-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.platform-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.platform-name {
+  font-size: 18px;
+  font-weight: bold;
+  color: #000;
+}
+
+.play-btn {
+  background: #e4e7ee;
+  color: #111;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background 0.2s ease;
+}
+
+.play-btn:hover {
+  background: #d0d3da;
+}
