@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Esency | [Page Title]</title>
+  <link rel="stylesheet" href="styles/styles.css" />
+</head>
+<body>
+  <header>
+    <h1>ESENCY</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="merch.html">Merch</a>
+      <a href="music.html">Music</a>
+      <a href="videos.html">Videos</a>
+      <a href="links.html">Links</a>
+      <a href="bio.html">Bio</a>
+      <a href="contact.html" class="active">Contact</a>
+    </nav>
+  </header>
+
+<main>
+     <div class="contact-header">
+      <h2>Contact Esency</h2>
+      <p>Whether it's a collab idea, a question, or a booking inquiry — drop me a message below.</p>
+    </div>
+
+  <section class="contact-wrapper">
+    <!-- Left: Contact Form -->
+    <div class="contact-left">
+      <form action="mailto:esencymusic@gmail.com" method="POST" enctype="text/plain">
+        <!-- Email -->
+        <label for="email">Your Email *</label>
+        <input type="email" id="email" name="Email" placeholder="you@example.com" required>
+
+        <!-- Phone -->
+        <label for="phone">Phone Number *</label>
+        <input type="tel" id="phone" name="Phone" placeholder="123-456-7890" required>
+
+        <!-- Reason Dropdown -->
+        <label for="reason">Reason for Contact:</label>
+        <select id="reason" name="Reason" required>
+          <option value="" disabled selected>Select a reason</option>
+          <option value="Booking">Booking</option>
+          <option value="Collaboration">Collaboration</option>
+          <option value="General Question">General Question</option>
+          <option value="Comment">Comment</option>
+          <option value="Media/Interview">Media / Interview Request</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <!-- Subject -->
+        <label for="subject">Subject *</label>
+        <input type="text" id="subject" name="Subject" placeholder="Your subject here" required>
+
+        <!-- Message -->
+        <label for="message">Your Message *</label>
+        <textarea id="message" name="Message" placeholder="Write your message here..." rows="4" required></textarea>
+
+        <!-- Optional link -->
+        <label for="link">Optional: Link to Song, Idea, or File</label>
+        <input type="url" id="link" name="Link" placeholder="https://yourlink.com">
+
+        <!-- Submit -->
+        <button type="submit">Send Message</button>
+      </form>
+    </div>
+
+    <!-- Right: Full Image -->
+    <div class="contact-right">
+      <img src="assets/images/contact-image.jpg" alt="Contact Esency" />
+    </div>
+  </section>
+</main>
+
+
+  <footer>
+    <p>&copy; 2025 Esency. All rights reserved.</p>
+  </footer>
+</body>
+</html>
