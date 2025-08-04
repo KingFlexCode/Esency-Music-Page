@@ -49,10 +49,9 @@
 /* ===================================
    RESET & BASE STYLES
 =================================== */
+
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
@@ -146,9 +145,11 @@ nav a.active {
 .songs-cover-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2vw;
-  max-width: 56.7vw;
-  margin: auto;
+  gap: 20px;
+  width: 900px;
+  padding: 20px 10px;
+  margin: 0 auto;
+  border: 2px dashed rgb(0, 109, 108);
 }
 
 .song-cover {
@@ -164,8 +165,8 @@ nav a.active {
 
 .img-grid {
   align-items: center;
-  width: 251px;
-  height: 251px;
+  width: 221px;
+  height: 221px;
   object-fit: cover;
   border-radius: 5px;
 }
