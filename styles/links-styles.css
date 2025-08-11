@@ -99,11 +99,18 @@ html, body {
 .background-wrapper {
   position: relative;
   min-height: 100vh;
-  background-image: url('../assets/images/Backgrounds/Linktree-background.jpg');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
   overflow: hidden;
+}
+/* subtle dark overlay so text stays readable */
+.background-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(0,0,0,.75), rgba(0,0,0,.6));
+  pointer-events: none;
 }
 
 /* The blur and white overlay */

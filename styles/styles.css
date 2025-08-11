@@ -123,7 +123,7 @@ nav a:hover {
 }
 
 nav a.active {
-  color: #ff0033;
+  color: #d70b0bec;
   pointer-events: none;
 }
 
@@ -146,29 +146,66 @@ nav a.active {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  width: 900px;
+  width: 543px;
   padding: 20px 10px;
   margin: 0 auto;
-  border: 2px dashed rgb(0, 109, 108);
 }
 
 .song-cover {
   display: flex;
   justify-content: center;
   align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 
 .song-cover p {
-  font-size: 20px;
+  font-size: 16px;
   margin-bottom: 20px;
 }
-
+/*
 .img-grid {
   align-items: center;
   width: 221px;
   height: 221px;
   object-fit: cover;
   border-radius: 5px;
+}
+*/
+.song-cover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: opacity 0.3s ease;
+}
+
+/* Hover Fade */
+.song-cover:hover img {
+  opacity: 0.3;
+}
+
+/* Overlay Text */
+.cover-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.6); /* semi-transparent dark overlay */
+  color: #ffcc00;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border-radius: 10px;
+}
+
+/* Show on Hover */
+.song-cover:hover .cover-overlay {
+  opacity: 1;
 }
 
 
@@ -456,4 +493,46 @@ footer {
   .contact-right {
     margin-top: 30px;
   }
+}
+
+/* ========== MERCH SHOWCASE ========== */
+
+.merch-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  padding: 60px 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+  justify-items: center;
+}
+
+.merch-item img {
+  width: 300px;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.merch-item img:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+  cursor: pointer;
+}
+
+.merch-item {
+  text-align: center;
+  color: #fff;
+}
+
+.product-name {
+  font-size: 18px;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.product-price {
+  font-size: 16px;
+  color: #ffcc00;
+  margin-top: 4px;
 }

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Esency | Links</title>
+  <link rel="stylesheet" href="../styles/links-styles.css" />
+</head>
+<body>
+    <div class="background-wrapper">
+  <div class="container">
+    <div class="album-art-box">
+  <img src="../assets/images/Album Art/fina-album-art.JPG" alt="Esency Album Cover" class="album-art" />
+</div>
+    <h1 class="page-title">ESENCY</h1>
+    <p class="tagline">All the vibes. One page.</p>
+
+    <!-- YouTube -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/logo-youtube-png-clipart-11.png" alt="YouTube Logo" class="platform-logo">
+        <span class="platform-name">YouTube</span>
+      </div>
+      <a href="https://youtu.be/HSbtF9zdgls?si=BFsLamVxziBWBT0M" class="play-btn" target="_blank">Play</a>
+    </div>
+
+    <!-- Spotify -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/spotify-logo-spotify-symbol-3.png" alt="Spotify Logo" class="platform-logo">
+        <span class="platform-name">Spotify</span>
+      </div>
+      <a href="https://open.spotify.com/album/61lYV3ZhCiDtThxpcAWwJs" class="play-btn" target="_blank">Play</a>
+    </div>
+
+    <!-- Apple Music -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/Apple-Music-Logo-PNG-Background-Image.png" alt="Apple Music Logo" class="platform-logo">
+        <span class="platform-name">Apple Music</span>
+      </div>
+      <a href="https://music.apple.com/us/album/fina-single/1525975908?uo=4&app=music&at=1001lry3&ct=dashboard" class="play-btn" target="_blank">Play</a>
+    </div>
+
+    <!-- SoundCloud -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/logo-soundcloud-4096.png" alt="SoundCloud Logo" class="platform-logo">
+        <span class="platform-name">SoundCloud</span>
+      </div>
+      <a href="https://soundcloud.com/esency/fina-prod-by-zcottie?si=1ce508569d0746e988b53ee97bfb7b4c&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing" class="play-btn" target="_blank">Play</a>
+    </div>
+
+    <!-- Amazon Music -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/logo-amazon-music-1024.png" alt="Amazon Music Logo" class="platform-logo">
+        <span class="platform-name">Amazon Music</span>
+      </div>
+      <a href="https://www.amazon.com/gp/product/B08F455Z7W/?tag=distrokid06-20" class="play-btn" target="_blank">Play</a>
+    </div>
+
+    <!-- Deezer -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/deezer-logol.png" alt="Deezer Logo" class="platform-logo">
+        <span class="platform-name">Deezer</span>
+      </div>
+      <a href="https://www.deezer.com/album/164482642" class="play-btn" target="_blank">Play</a>
+    </div>
+
+    <!-- Instagram -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/instagram-logos-png-images-free-download-2.png" alt="Instagram Logo" class="platform-logo">
+        <span class="platform-name">Instagram</span>
+      </div>
+      <a href="https://www.instagram.com/esencyofficial/" class="play-btn" target="_blank">Follow</a>
+    </div>
+
+    <!-- Twitter / X -->
+    <div class="platform-card">
+      <div class="platform-info">
+        <img src="../assets/images/Logos/twitter-logo-1.png" alt="Twitter Logo" class="platform-logo">
+        <span class="platform-name">Twitter / X</span>
+      </div>
+      <a href="https://x.com/esency" class="play-btn" target="_blank">Follow</a>
+    </div>   
+  </div>
+  </div>
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const bgWrapper = document.querySelector(".background-wrapper");
+    if (!bgWrapper) return;
+
+    // Primary source: the album art image on the page
+    const albumImg = document.querySelector(".album-art");
+    
+    const src = albumImg?.getAttribute("src") || fallbackSrc;
+    if (src) {
+      bgWrapper.style.backgroundImage = `url('${src}')`;
+    }
+  });
+</script>
+</body>
+</html>
