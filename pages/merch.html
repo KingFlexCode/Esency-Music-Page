@@ -5,6 +5,36 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Esency | [Page Title]</title>
   <link rel="stylesheet" href="../styles/styles.css" />
+
+  <!-- optional: small helper styles for the size selector -->
+  <style>
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+    .size-row label {
+      font-size: 14px;
+      white-space: nowrap;
+    }
+    .size-row select {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      min-width: 140px;
+    }
+    .merch-item button {
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      background: #111;
+      color: #fff;
+    }
+  </style>
 </head>
 <body>
   <header>
@@ -22,57 +52,171 @@
 
   <main>
     <div class="page-section">
-    <h2>🚧 Work in Progress</h2>
-    <p>This page is currently under construction. Please check back soon!</p>
+      <h2>🚧 Work in Progress</h2>
+      <p>This page is currently under construction. Please check back soon!</p>
     </div>
 
     <div class="merch-section-header">
       <h1>T-Shirts</h1>
     </div>
+
     <section class="merch-gallery">
-    <div class="merch-item">
-      <img src="../assets/images/Merch/unisex-jersey-t-shirt-red-front-6169a26fc641e.PNG" alt="Hoodie Design 1" />
-      <p class="product-name">Red T-shirt</p>
-      <p class="product-price">$35.00</p>
-    </div>
-    <div class="merch-item">
-      <img src="../assets/images/Merch/unisex-jersey-t-shirt-white-front-6169a26fd3440.PNG" alt="T-Shirt Design 1" />
-      <p class="product-name">White T-shirt</p>
-      <p class="product-price">$35.00</p>
-    </div>
-    <div class="merch-item">
-      <img src="../assets/images/Merch/unisex-jersey-t-shirt-heather-grey-front-6169a26fcf8ca.PNG" alt="Cap Design 1" />
-      <p class="product-name">Grey T-shirt</p>
-      <p class="product-price">$35.00</p>   
-    </div>
+      <div class="merch-item" data-product-id="red-tee">
+        <img src="../assets/images/Merch/unisex-jersey-t-shirt-red-front-6169a26fc641e.PNG" alt="Red T-shirt" />
+        <p class="product-name">Red T-shirt</p>
+        <p class="product-price">$35.00</p>
+
+        <div class="size-row">
+          <label for="size-red-tee">Size:</label>
+          <select id="size-red-tee" name="size">
+            <option value="">Select size</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+            <option value="XXL">2XL</option>
+          </select>
+        </div>
+
+        <button type="button">Add to Cart</button>
+      </div>
+
+      <div class="merch-item" data-product-id="white-tee">
+        <img src="../assets/images/Merch/unisex-jersey-t-shirt-white-front-6169a26fd3440.PNG" alt="White T-shirt" />
+        <p class="product-name">White T-shirt</p>
+        <p class="product-price">$35.00</p>
+
+        <div class="size-row">
+          <label for="size-white-tee">Size:</label>
+          <select id="size-white-tee" name="size">
+            <option value="">Select size</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+            <option value="XXL">2XL</option>
+          </select>
+        </div>
+
+        <button type="button">Add to Cart</button>
+      </div>
+
+      <div class="merch-item" data-product-id="grey-tee">
+        <img src="../assets/images/Merch/unisex-jersey-t-shirt-heather-grey-front-6169a26fcf8ca.PNG" alt="Grey T-shirt" />
+        <p class="product-name">Grey T-shirt</p>
+        <p class="product-price">$35.00</p>
+
+        <div class="size-row">
+          <label for="size-grey-tee">Size:</label>
+          <select id="size-grey-tee" name="size">
+            <option value="">Select size</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+            <option value="XXL">2XL</option>
+          </select>
+        </div>
+
+        <button type="button">Add to Cart</button>
+      </div>
     </section>
 
     <div class="merch-section-header">
       <h1>Hoodies</h1>
     </div>
-    <section class="merch-gallery">
-    <div class="merch-item">
-      <img src="../assets/images/Merch/unisex-premium-hoodie-black-front-6169a2cf546a4.PNG" alt="Cap Design 1" />
-      <p class="product-name">Black Hoodie</p>
-      <p class="product-price">$45.00</p>   
-    </div>
-     <div class="merch-item">
-      <img src="../assets/images/Merch/unisex-premium-hoodie-white-front-6169a2cf57b3b.PNG" alt="Cap Design 1" />
-      <p class="product-name">White Hoodie</p>
-      <p class="product-price">$45.00</p>   
-    </div>
-     <div class="merch-item">
-      <img src="../assets/images/Merch/unisex-premium-hoodie-carbon-grey-front-6169a2cf56944.PNG" alt="Cap Design 1" />
-      <p class="product-name">Grey Hoodie</p>
-      <p class="product-price">$45.00</p>    
-    </div>
-    <!-- Add more items as needed -->
-  </section>
-</main>
 
+    <section class="merch-gallery">
+      <div class="merch-item" data-product-id="black-hoodie">
+        <img src="../assets/images/Merch/unisex-premium-hoodie-black-front-6169a2cf546a4.PNG" alt="Black Hoodie" />
+        <p class="product-name">Black Hoodie</p>
+        <p class="product-price">$45.00</p>
+
+        <div class="size-row">
+          <label for="size-black-hoodie">Size:</label>
+          <select id="size-black-hoodie" name="size">
+            <option value="">Select size</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+            <option value="XXL">2XL</option>
+          </select>
+        </div>
+
+        <button type="button">Add to Cart</button>
+      </div>
+
+      <div class="merch-item" data-product-id="white-hoodie">
+        <img src="../assets/images/Merch/unisex-premium-hoodie-white-front-6169a2cf57b3b.PNG" alt="White Hoodie" />
+        <p class="product-name">White Hoodie</p>
+        <p class="product-price">$45.00</p>
+
+        <div class="size-row">
+          <label for="size-white-hoodie">Size:</label>
+          <select id="size-white-hoodie" name="size">
+            <option value="">Select size</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+            <option value="XXL">2XL</option>
+          </select>
+        </div>
+
+        <button type="button">Add to Cart</button>
+      </div>
+
+      <div class="merch-item" data-product-id="grey-hoodie">
+        <img src="../assets/images/Merch/unisex-premium-hoodie-carbon-grey-front-6169a2cf56944.PNG" alt="Grey Hoodie" />
+        <p class="product-name">Grey Hoodie</p>
+        <p class="product-price">$45.00</p>
+
+        <div class="size-row">
+          <label for="size-grey-hoodie">Size:</label>
+          <select id="size-grey-hoodie" name="size">
+            <option value="">Select size</option>
+            <option value="S">Small</option>
+            <option value="M">Medium</option>
+            <option value="L">Large</option>
+            <option value="XL">Extra Large</option>
+            <option value="XXL">2XL</option>
+          </select>
+        </div>
+
+        <button type="button">Add to Cart</button>
+      </div>
+    </section>
+  </main>
 
   <footer>
     <p>&copy; 2025 Esency. All rights reserved.</p>
   </footer>
+
+  <!-- tiny helper script: ensures a size is chosen and shows what was added -->
+  <script>
+    document.body.addEventListener("click", (e) => {
+      if (e.target.tagName.toLowerCase() !== "button") return;
+
+      const item = e.target.closest(".merch-item");
+      if (!item) return;
+
+      const productId = item.getAttribute("data-product-id");
+      const name = item.querySelector(".product-name")?.textContent?.trim() || productId;
+      const price = item.querySelector(".product-price")?.textContent?.trim() || "";
+      const select = item.querySelector("select[name='size']");
+      const size = select?.value || "";
+
+      if (!size) {
+        alert("Please select a size first.");
+        select?.focus();
+        return;
+      }
+
+      // Here you can integrate with your cart/localStorage/backend fetch as needed.
+      console.log("Add to cart:", { productId, name, price, size });
+      alert(`${name} (${size}) added to cart.`);
+    });
+  </script>
 </body>
 </html>

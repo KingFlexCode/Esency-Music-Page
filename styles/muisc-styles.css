@@ -1,0 +1,120 @@
+/* ===============================
+   THEME
+=============================== */
+:root{
+  --bg:#000;
+  --panel:#444;
+  --text:#fff;
+  --muted:#ccc;
+  --line:#eee;
+  --brand:#ffcc00;
+}
+
+/* ===============================
+   BASE
+=============================== */
+*{ box-sizing:border-box; }
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.6;
+}
+a{ color:var(--text); text-decoration:none; }
+a:hover{ color:var(--brand); }
+
+/* ===============================
+   HEADER / NAV
+=============================== */
+header{ text-align:center; background:#050505; }
+header h1{ margin:0; padding:16px 0 8px; letter-spacing:2px; }
+nav{
+  display:flex; flex-wrap:wrap; justify-content:center; gap:16px;
+  padding:0 0 16px;
+}
+nav a{
+  font-weight:700; font-size:16px; padding:6px 12px; border-radius:6px;
+}
+nav a.active{ color:#d70b0bec; pointer-events:none; }
+
+/* ===============================
+   MUSIC PLAYER LAYOUT
+=============================== */
+.music-wrap{ max-width:980px; margin:40px auto; padding:0 16px; }
+
+.music-hero{
+  display:grid; grid-template-columns:140px 1fr; gap:16px; align-items:center;
+  background:var(--panel); border:1px solid var(--line);
+  border-radius:12px; padding:16px;
+}
+
+.music-cover{
+  width:140px; height:140px; object-fit:cover; border-radius:8px; user-select:none;
+}
+
+.music-meta h2{ margin:0 0 4px; font-size:20px; line-height:1.2; }
+.music-meta p{ margin:0 0 12px; color:var(--brand); }
+
+/* Controls row: prev/play/next | timeline | volume */
+.controls{
+  display:grid; grid-template-columns:auto 1fr auto; gap:12px; align-items:center;
+}
+
+.btns{ display:inline-flex; gap:10px; }
+.btns button{
+  display:inline-flex; align-items:center; justify-content:center;
+  border:1px solid #ddd; background:#fff; color:#000;
+  border-radius:8px; padding:8px 12px; cursor:pointer;
+}
+.btns button:focus-visible,
+.timeline input:focus-visible,
+.volume input:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+
+/* Timeline (seek) */
+.timeline{
+  display:grid; grid-template-columns:auto 1fr auto; gap:8px; align-items:center;
+}
+.timeline .time{
+  font-variant-numeric:tabular-nums; font-size:12px; color:#444;
+}
+.timeline input[type="range"]{
+  width:100%; accent-color:#111;
+}
+
+/* Volume */
+.volume{ display:inline-flex; gap:8px; align-items:center; }
+.volume input[type="range"]{ width:110px; accent-color:#6d6d6d; }
+
+/* ===============================
+   PLAYLIST
+=============================== */
+.playlist{
+  margin-top:18px; border:1px solid #888; border-radius:12px; overflow:hidden;
+}
+.track{
+  display:grid; grid-template-columns:56px 1fr auto; gap:12px; align-items:center;
+  padding:10px; cursor:pointer; background:#111;
+}
+.track + .track{ border-top:1px solid var(--line); }
+.track:hover{ background:#888; }
+.track.active{ background:#888; }
+.track img{ width:56px; height:56px; object-fit:cover; border-radius:6px; user-select:none; }
+.t-title{ margin:0; font-weight:600; }
+.t-artist{ margin:2px 0 0; color:var(--brand); font-size:14px; }
+
+/* ===============================
+   FOOTER
+=============================== */
+footer{ text-align:center; font-size:14px; color:#777; margin:40px 0; }
+
+/* ===============================
+   RESPONSIVE
+=============================== */
+@media (max-width:640px){
+  .music-hero{ grid-template-columns:1fr; text-align:center; }
+  .music-cover{ margin:0 auto; }
+  .controls{ grid-template-columns:1fr; gap:8px; }
+  .timeline{ grid-template-columns:auto 1fr auto; }
+  .volume input[type="range"]{ width:90px; }
+}
