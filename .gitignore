@@ -1,0 +1,15 @@
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+
+# Node / builds (if you add tooling later)
+node_modules/
+dist/
+build/
+
+
+git rm -r --cached .DS_Store
