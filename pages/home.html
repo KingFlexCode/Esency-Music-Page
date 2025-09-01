@@ -10,6 +10,7 @@
     <h1>ESENCY</h1>
     <nav>
       <a href="./home.html" class="active" aria-current="page">Home</a>
+      <a href="./blog.html">Blog</a>
       <a href="./merch.html">Merch</a>
       <a href="./music.html">Music</a>
       <a href="./videos.html">Videos</a>
@@ -123,26 +124,77 @@
       </div>
     </div>
 
-    <!-- Featured Music 
-    <div class="featured-music">
-      <h2>Latest Released Song</h2>
-      <img src="./assets/images/Esency-Photos/Nada-Personal-album-cover.jpg" alt="Album cover" />
-      <p>Nada Personal. Available on Spotify, Apple Music, and all other streaming platforms.</p>
-      <a href="#">Listen Now</a>
-    </div>
-    -->
+  <!-- Email signup (keeps your design) -->
+  <div class="email-signup" id="subscribe-section" style="margin-top:40px;">
+    <h2>Stay up to date</h2>
+    <p>Get the latest updates on new music, shows, and merch.</p>
 
-    <!-- Email Signup -->
-    <div class="email-signup">
-      <h2>Stay up to date</h2>
-      <p>Get the latest updates on new music, shows, and merch.</p>
-      <input type="email" placeholder="Enter your email..." />
-      <button>Subscribe</button>
-    </div>
+    <!-- Hidden iframe prevents redirect to Google’s thank-you page -->
+    <iframe name="hidden_iframe" style="display:none"></iframe>
+
+    <form
+      id="subscribe"
+      class="email-signup-2"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSdeflP6ETo3KfxT7lcnSgAZt1zN6ODSQ1qN0haHki4ckZQn5w/formResponse"
+      method="POST"
+      target="hidden_iframe"
+      onsubmit="return handleSubscribed(event)"
+    >
+      <!-- name MUST match your Google Forms field key -->
+      <input
+        type="email"
+        name="entry.388220476"
+        placeholder="Enter your email..."
+        required
+        class="form-control"
+        aria-label="Email address"
+        autocomplete="email"
+        spellcheck="false"
+        inputmode="email"
+      />
+
+      <!-- Honeypot (spam trap) -->
+      <input type="text" name="hp_field" style="display:none" tabindex="-1" autocomplete="off" />
+
+      <div>
+        <button class="btn btn--brand" type="submit" id="subscribe-btn">Subscribe</button>
+      </div>
+
+      <p id="sub-msg" style="margin-top:8px; color: var(--text-dim);"></p>
+    </form>
+  </div>
+
+  <script>
+    function handleSubscribed(e){
+      const form = e.target;
+      const btn  = document.getElementById('subscribe-btn');
+      const msg  = document.getElementById('sub-msg');
+
+      // Block obvious bots
+      if (form.querySelector('[name="hp_field"]').value) return false;
+
+      btn.disabled = true;
+      btn.textContent = 'Subscribing…';
+      msg.textContent = '';
+
+      // Let the POST go to Google Forms via the hidden iframe.
+      // Since there’s no same-origin callback, show success after a short delay.
+      setTimeout(() => {
+        form.reset();
+        btn.disabled = false;
+        btn.textContent = 'Subscribe';
+        msg.textContent = 'Thanks! You’re on the list.';
+      }, 1200);
+
+      return true; // allow submit to hidden_iframe
+    }
+  </script>
+  </div>
   </main>
 
   <footer>
     <p>&copy; 2025 Esency. All rights reserved.</p>
   </footer>
+
 </body>
 </html>
