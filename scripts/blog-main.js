@@ -11,7 +11,7 @@ const posts = [
     url: "../posts/the-power-of-writing-and-producing-your-own-music.html"
   },
   {
-    id: "new-song-slide-dropping-soon",
+    id: "slide-by-esency",
     title: "New Release: Slide dropping soon by Esency",
     date: "2025-09-01",
     tags: ["new release", "slide by esency", "new song", "slide up on me"],
