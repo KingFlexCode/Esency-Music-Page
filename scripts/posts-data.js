@@ -25,7 +25,7 @@
       },
       {
         id: "slide-by-esency",
-        title: 'New Release: "Slide" by Esency dropping soon.',
+        title: 'New Release! "SLIDE" by Esency dropping soon',
         date: "2025-09-01",
         tags: ["new release", "slide by esency", "new song", "slide up on me"],
         excerpt: "With R&B season coming soon, a new single with catchy melodys, addictive drum bounce, and catchy hook is soon to drop.",
@@ -44,7 +44,7 @@
       },
       {
         id: "nada-personal-album-breakdown",
-        title: "Nada Personal Album — Track-by-Track Breakdown",
+        title: "Nada Personal Album Track by Track Breakdown",
         date: "2025-08-28",
         tags: ["feature", "album", "nada personal", "latin album"],
         excerpt: "Inside the song writing, melodies, drums, bass lines, and late-night sessions that shaped 'Nada Personal'.",
@@ -82,55 +82,99 @@
       set(id,n){ this._load()[id]=n; this._save(); return n; },
       increment(id){ return this.set(id, this.get(id)+1); }
     };
+// -------- Router: get id from ?id=... OR from filename, then render --------
+(function boot(){
+  const params = new URLSearchParams(location.search);
+  let id = params.get("id");
 
-    // -------- Router: read id from ?id=... and render --------
-    (function boot(){
-      const params = new URLSearchParams(location.search);
-      const id = params.get("id");
+  // If no ?id, derive from filename: /pages/posts/<slug>.html  ->  <slug>
+  if (!id) {
+    const m = location.pathname.match(/\/posts\/([^\/]+)\.html$/);
+    if (m) id = m[1];
+  }
 
-      const post = posts.find(p => p.id === id) || posts[0]; // fallback to first if missing
-      const idx = posts.findIndex(p => p.id === post.id);
+  // Find the post
+  const post = posts.find(p => p.id === id);
+  if (!post) {
+    // No silent fallback to posts[0]; show a helpful 404-style message
+    document.getElementById("post").innerHTML = `
+      <div class="content" style="padding:16px">
+        <h1>Post not found</h1>
+        <p>We couldn’t find a post with id <code>${id ?? '(none)'}</code>.</p>
+        <h3>Recent posts</h3>
+        <ul>
+          ${posts.slice(0,5).map(p => `<li><a href="./${p.id}.html">${p.title}</a></li>`).join('')}
+        </ul>
+      </div>`;
+    document.getElementById("year").textContent = new Date().getFullYear();
+    return;
+  }
 
-      // Fill meta
-      document.title = `${post.title} • Esency Blog`;
-      document.getElementById("post-title").textContent = post.title;
-      document.getElementById("post-date").textContent = fmtDate(post.date);
-      document.getElementById("post-tags").innerHTML = (post.tags||[]).map(t=>`<span class="tag">#${t}</span>`).join("");
-      document.getElementById("post-cover").src = post.cover;
+  const idx = posts.findIndex(p => p.id === post.id);
 
-      // Content (inline). If you prefer external files, you can fetch here.
-      const contentHTML = post.content || "<p>Post content coming soon.</p>";
-      document.getElementById("post-content").innerHTML = contentHTML;
-      document.getElementById("read-time").textContent = readingTime(contentHTML);
+  // Fill meta
+  document.title = `${post.title} • Esency Blog`;
+  document.getElementById("post-title").textContent = post.title;
 
-      // Views
-      document.getElementById("views").textContent = viewStore.increment(post.id);
+  const fmtDate = (iso) =>
+    new Date(iso + "T12:00:00").toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
 
-      // Prev/Next
-      const prev = posts[idx-1] || null;
-      const next = posts[idx+1] || null;
+  document.getElementById("post-date").textContent =
+    fmtDate(post.date);
 
-      const prevLink = document.getElementById("prevLink");
-      const nextLink = document.getElementById("nextLink");
+  document.getElementById("post-tags").innerHTML =
+    (post.tags||[]).map(t=>`<span class="tag">#${t}</span>`).join("");
 
-      if (prev){
-        prevLink.href = `../posts/slide-by-esency.html?id=${prev.id}`;
-        document.getElementById("prevTitle").textContent = prev.title;
-      } else {
-        prevLink.style.pointerEvents = "none";
-        prevLink.style.opacity = ".5";
-        document.getElementById("prevTitle").textContent = "No previous post";
-      }
+  // IMPORTANT: Make sure your cover paths are correct from /pages/posts/.
+  // If your data uses "../assets/...", that is often WRONG here — you likely need "../../assets/..."
+  // Best: store cover paths relative to the site root (e.g. "/assets/...") or fix the strings in `posts`.
+  document.getElementById("post-cover").src = post.cover;
+  document.getElementById("post-cover").alt = post.title;
 
-      if (next){
-        nextLink.href = `../posts/slide-by-esency.html?id=${next.id}`;
-        document.getElementById("nextTitle").textContent = next.title;
-      } else {
-        nextLink.style.pointerEvents = "none";
-        nextLink.style.opacity = ".5";
-        document.getElementById("nextTitle").textContent = "No next post";
-      }
+  // Content
+  const contentHTML = post.content || "<p>Post content coming soon.</p>";
+  document.getElementById("post-content").innerHTML = contentHTML;
 
-      // Footer year
-      document.getElementById("year").textContent = new Date().getFullYear();
-    })();
+  // Reading time
+  (function(){
+    const tmp = document.createElement("div");
+    tmp.innerHTML = contentHTML;
+    const words = (tmp.textContent||"").trim().split(/\s+/).filter(Boolean).length;
+    document.getElementById("read-time").textContent = `${Math.max(1, Math.round(words/200))} min read`;
+  })();
+
+  // Views
+  document.getElementById("views").textContent = viewStore.increment(post.id);
+
+  // Prev/Next — link to sibling HTML files in the same folder
+  const prev = posts[idx-1] || null;
+  const next = posts[idx+1] || null;
+
+  const prevLink = document.getElementById("prevLink");
+  const nextLink = document.getElementById("nextLink");
+
+  if (prev){
+    prevLink.href = `./${prev.id}.html`;
+    document.getElementById("prevTitle").textContent = prev.title;
+    prevLink.style.removeProperty('pointer-events');
+    prevLink.style.removeProperty('opacity');
+  } else {
+    prevLink.style.pointerEvents = "none";
+    prevLink.style.opacity = ".5";
+    document.getElementById("prevTitle").textContent = "No previous post";
+  }
+
+  if (next){
+    nextLink.href = `./${next.id}.html`;
+    document.getElementById("nextTitle").textContent = next.title;
+    nextLink.style.removeProperty('pointer-events');
+    nextLink.style.removeProperty('opacity');
+  } else {
+    nextLink.style.pointerEvents = "none";
+    nextLink.style.opacity = ".5";
+    document.getElementById("nextTitle").textContent = "No next post";
+  }
+
+  // Footer year
+  document.getElementById("year").textContent = new Date().getFullYear();
+})();
