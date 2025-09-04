@@ -20,62 +20,52 @@
       <a href="./contact.html" class="active" aria-current="page">Contact</a>
     </nav>
   </header>
-
 <main>
-     <div class="contact-header">
-      <h2>Contact Esency</h2>
-      <p>Whether it's a collab idea, a question, or a booking inquiry — drop me a message below.</p>
-    </div>
-
   <section class="contact-wrapper">
-    <!-- Left: Contact Form -->
-    <div class="contact-left">
+    <div class="contact-form">
       <form action="mailto:esencymusic@gmail.com" method="POST" enctype="text/plain">
+        <div class="form-header">
+          <h2>Contact Esency</nh2>
+          <p>For collaberation, a question, or booking inquiries.</p>
+        </div>
         <!-- Email -->
-        <label for="email">Your Email *</label>
+        <label for="email">Your Email</label>
         <input type="email" id="email" name="Email" placeholder="you@example.com" required>
 
         <!-- Phone -->
-        <label for="phone">Phone Number *</label>
+        <label for="phone">Phone Number</label>
         <input type="tel" id="phone" name="Phone" placeholder="123-456-7890" required>
 
         <!-- Reason Dropdown -->
         <label for="reason">Reason for Contact:</label>
         <select id="reason" name="Reason" required>
           <option value="" disabled selected>Select a reason</option>
-          <option value="Booking">Booking</option>
+          <option value="Booking Inquiry">Booking Inquiry</option>
           <option value="Collaboration">Collaboration</option>
           <option value="General Question">General Question</option>
           <option value="Comment">Comment</option>
-          <option value="Media/Interview">Media / Interview Request</option>
+          <option value="Media or Interview">Media or Interview Request</option>
           <option value="Other">Other</option>
         </select>
 
         <!-- Subject -->
-        <label for="subject">Subject *</label>
+        <label for="subject">Subject</label>
         <input type="text" id="subject" name="Subject" placeholder="Your subject here" required>
 
         <!-- Message -->
-        <label for="message">Your Message *</label>
-        <textarea id="message" name="Message" placeholder="Write your message here..." rows="4" required></textarea>
+        <label for="message">Your Message</label>
+        <textarea id="message" name="Message" placeholder="Write your message here..." rows="10" required></textarea>
 
         <!-- Optional link -->
         <label for="link">Optional: Link to Song, Idea, or File</label>
         <input type="url" id="link" name="Link" placeholder="https://yourlink.com">
 
         <!-- Submit -->
-        <button type="submit">Send Message</button>
+        <button type="submit">Submit</button>
       </form>
-    </div>
-
-    <!-- Right: Full Image -->
-    <div class="contact-img">
-      <img src="../assets/images/Esency-Photos/Smoky Street Nights_095.JPG" alt="Contact Esency" />
     </div>
   </section>
 </main>
-
-
   <footer>
     <p>&copy; 2025 Esency. All rights reserved.</p>
   </footer>
