@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Esency | Music</title>
+  <link rel="stylesheet" href="../styles/muisc-styles.css" />
+</head>
+<body>
+  <header>
+    <h1>ESENCY</h1>
+    <nav>
+      <a href="./home.html">Home</a>
+      <a href="./blog.html">Blog</a>
+      <a href="./merch.html">Merch</a>
+      <a href="./music.html" class="active" aria-current="page">Music</a>
+      <a href="./videos.html">Videos</a>
+      <a href="./links.html">Links</a>
+      <a href="./bio.html">Bio</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+  </header>
+
+  <main class="music-wrap">
+    <section class="music-hero">
+      <img class="music-cover" id="cover" src="../assets/images/Album Art/nada-personal-album-art.jpg" alt="Cover">
+      <div class="music-meta">
+        <h2 id="title">Track Title</h2>
+        <p id="artist">Artist</p>
+
+        <div class="controls">
+          <div class="btns">
+  <button id="prevBtn" aria-label="Previous">⏮</button>
+  <button id="playPauseBtn" aria-label="Play">
+    <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+      <polygon points="0,0 14,7 0,14"></polygon>
+    </svg>
+  </button>
+  <button id="nextBtn" aria-label="Next">⏭</button>
+</div>
+
+          <div class="timeline">
+            <span id="currentTime" class="time">0:00</span>
+            <input id="seek" type="range" min="0" max="100" value="0" step="0.1" aria-label="Seek">
+            <span id="duration" class="time">0:00</span>
+          </div>
+
+          <div class="volume">
+            <button id="muteBtn" aria-label="Mute">🔈</button>
+            <input id="vol" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume">
+          </div>
+        </div>
+      </div>
+      <audio id="audio" preload="metadata"></audio>
+    </section>
+
+    <section class="playlist" id="playlist">
+      <!-- Tracks render here -->
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Esency. All rights reserved.</p>
+  </footer>
+
+  <script>
+    // 1) Your tracks (update paths/titles as needed)
+    const tracks = [
+      {
+        src: "../assets/images/music/Title_ El Jumo de Mi Vida.mp3",
+        title: "Nada Personal",
+        artist: "Esency",
+        cover: "../assets/images/Album Art/nada-personal-album-art.jpg"
+      },
+      {
+        src: "../assets/images/music/Drinking to your memories.wav",
+        title: "Vape",
+        artist: "Esency",
+        cover: "../assets/images/Esency-Photos/Smoky Street Nights_070.JPG"
+      },
+      {
+        src: "../assets/images/music/Title_ El Jumo de Mi Vida (1).mp3",
+        title: "My Ball",
+        artist: "Esency",
+        cover: "../assets/images/Esency-Photos/Smoky Street Nights_085.JPG"
+      }
+    ];
+
+    // 2) Elements
+    const audio = document.getElementById("audio");
+    const cover = document.getElementById("cover");
+    const title = document.getElementById("title");
+    const artist = document.getElementById("artist");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const seek = document.getElementById("seek");
+    const currentTimeEl = document.getElementById("currentTime");
+    const durationEl = document.getElementById("duration");
+    const vol = document.getElementById("vol");
+    const muteBtn = document.getElementById("muteBtn");
+    const playlistEl = document.getElementById("playlist");
+
+    let current = 0;
+    let seeking = false;
+
+    // 3) Helpers
+    const fmt = (s) => {
+      if (!isFinite(s)) return "0:00";
+      const m = Math.floor(s / 60);
+      const sec = Math.floor(s % 60).toString().padStart(2, "0");
+      return `${m}:${sec}`;
+    };
+
+    function loadTrack(i) {
+      current = i;
+      const t = tracks[i];
+      audio.src = t.src;
+      title.textContent = t.title;
+      artist.textContent = t.artist;
+      cover.src = t.cover;
+      [...playlistEl.querySelectorAll(".track")].forEach((el, idx) => {
+        el.classList.toggle("active", idx === i);
+      });
+    }
+
+    function playTrack() {
+      audio.play().catch(() => {});
+      playPauseBtn.innerHTML = `
+        <svg id="pauseIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor">
+          <rect x="0" y="0" width="4" height="14"></rect>
+          <rect x="8" y="0" width="4" height="14"></rect>
+        </svg>
+      `;
+      playPauseBtn.setAttribute("aria-label", "Pause");
+    }
+
+    function pauseTrack() {
+      audio.pause();
+      playPauseBtn.innerHTML = `
+        <svg id="playIcon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14" fill="currentColor">
+          <polygon points="0,0 14,7 0,14"></polygon>
+        </svg>
+      `;
+      playPauseBtn.setAttribute("aria-label", "Play");
+    }
+
+    function togglePlay() {
+      audio.paused ? playTrack() : pauseTrack();
+    }
+
+    function nextTrack() {
+      const i = (current + 1) % tracks.length;
+      loadTrack(i);
+      playTrack();
+    }
+
+    function prevTrack() {
+      const i = (current - 1 + tracks.length) % tracks.length;
+      loadTrack(i);
+      playTrack();
+    }
+
+    // 4) Build playlist UI
+    function buildPlaylist() {
+      playlistEl.innerHTML = tracks.map((t, i) => `
+        <div class="track" data-idx="${i}">
+          <img src="${t.cover}" alt="Cover: ${t.title}">
+          <div>
+            <p class="t-title">${t.title}</p>
+            <p class="t-artist">${t.artist}</p>
+          </div>
+          <span class="time" data-time>--:--</span>
+        </div>
+      `).join("");
+
+      // Preload durations
+      tracks.forEach((t, i) => {
+        const a = new Audio();
+        a.src = t.src;
+        a.preload = "metadata";
+        a.addEventListener("loadedmetadata", () => {
+          const slot = playlistEl.querySelector(`.track[data-idx="${i}"] [data-time]`);
+          if (slot) slot.textContent = fmt(a.duration);
+        });
+      });
+
+      // Click handler
+      playlistEl.addEventListener("click", (e) => {
+        const item = e.target.closest(".track");
+        if (!item) return;
+        const idx = Number(item.dataset.idx);
+        loadTrack(idx);
+        playTrack();
+      });
+    }
+
+    // 5) Wire controls
+    playPauseBtn.addEventListener("click", togglePlay);
+    nextBtn.addEventListener("click", nextTrack);
+    prevBtn.addEventListener("click", prevTrack);
+
+    audio.addEventListener("timeupdate", () => {
+      if (seeking) return;
+      const p = (audio.currentTime / (audio.duration || 1)) * 100;
+      seek.value = p || 0;
+      currentTimeEl.textContent = fmt(audio.currentTime);
+      durationEl.textContent = fmt(audio.duration);
+    });
+
+    seek.addEventListener("input", () => { seeking = true; });
+    seek.addEventListener("change", () => {
+      const pct = Number(seek.value) / 100;
+      audio.currentTime = pct * (audio.duration || 0);
+      seeking = false;
+    });
+
+    vol.addEventListener("input", () => {
+      audio.volume = Number(vol.value);
+      audio.muted = audio.volume === 0;
+      muteBtn.textContent = audio.muted ? "🔇" : "🔈";
+    });
+
+    muteBtn.addEventListener("click", () => {
+      audio.muted = !audio.muted;
+      muteBtn.textContent = audio.muted ? "🔇" : "🔈";
+    });
+
+    audio.addEventListener("ended", nextTrack);
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") { e.preventDefault(); togglePlay(); }
+      if (e.code === "ArrowRight") nextTrack();
+      if (e.code === "ArrowLeft") prevTrack();
+    });
+
+    // 6) Init
+    buildPlaylist();
+    loadTrack(0);
+  </script>
+</body>
+</html>
