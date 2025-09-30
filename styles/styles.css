@@ -14,6 +14,9 @@
 * {
     box-sizing: border-box;
 }
+html, body{
+    min-height: 100%;
+}
 body {
     font-family: 'Helvetica Neue', sans-serif;
     background: var(--black);
@@ -29,7 +32,7 @@ a:hover {
     color: var(--brand);
 }
 /* Buttons (shared) */
-.btn {
+.btn{
     padding: 0px 20px;
     margin-left: 10px;
     height: 32px;
@@ -41,6 +44,7 @@ a:hover {
     cursor: pointer;
     transition: background .3s ease, color .3s ease;
 }
+
 .btn--brand {
     background: var(--brand);
     color: #000;
@@ -256,12 +260,12 @@ footer {
 .contact-form form {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
     align-items: left;
     margin: 40px auto;
     max-width: 650px;
     padding: 50px 75px;
-    background: rgba(42, 42, 42, 0.8); /* light transparent white */
+    background: rgba(42, 42, 42, 0.8);
     border-radius: 5px;
     backdrop-filter: blur(15px);
     -webkit-backdrop-filter: blur(15px);
@@ -283,12 +287,20 @@ footer {
     border-radius: 4px;
     border: none;
 }
-.contact-form form button {
-    max-width: 25%;
-    height: 25px;
-    margin-top: 20px;
-}
 
+.contact-submit-btn{
+    display: block;
+    justify-content: center;
+    text-align: center;
+    cursor: pointer;
+    font-size: 12px;
+    height: 25px;
+    width: 25%;
+    margin-top: 20px;
+    border: 0;
+    border-radius: 5px;
+    background-color: #ffcc00;
+}
 /* Merch showcase */
 .merch-section-header h1 {
     text-align: center;
@@ -344,6 +356,9 @@ footer {
 .page-section p {
     font-size: 18px;
     color: var(--text-dim);
+}
+#message{
+    font-size: 16px;
 }
 /* Responsive */
 @media (max-width: 900px) {
