@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Esency | [Page Title]</title>
+  <title>Esency Contact Page</title>
   <link rel="stylesheet" href="../styles/styles.css" />
 </head>
-<body>
-  <header>
-    <h1>ESENCY</h1>
-    <nav>
+<body class="contact-background">
+  <header class="nav-header">
+    <h1 class="esency-logo">ESENCY</h1>
+    <nav class="nav-bar">
       <a href="./home.html">Home</a>
       <a href="./blog.html">Blog</a>
       <a href="./merch.html">Merch</a>
@@ -21,11 +21,15 @@
     </nav>
   </header>
 <main>
-  <section class="contact-wrapper">
     <div class="contact-form">
-      <form action="mailto:esencymusic@gmail.com" method="POST" enctype="text/plain">
+      <form 
+      action="mailto:esencymusic@gmail.com" 
+      method="POST" 
+      enctype="text/plain"
+      netlify>
+
         <div class="form-header">
-          <h2>Contact Esency</nh2>
+          <h2>Contact Esency</h2>
           <p>For collaberation, a question, or booking inquiries.</p>
         </div>
         <!-- Email -->
@@ -57,14 +61,13 @@
         <textarea id="message" name="Message" placeholder="Write your message here..." rows="10" required></textarea>
 
         <!-- Optional link -->
-        <label for="link">Optional: Link to Song, Idea, or File</label>
+        <label for="link">(Optional): Share a Link to Song</label>
         <input type="url" id="link" name="Link" placeholder="https://yourlink.com">
 
         <!-- Submit -->
         <button type="submit">Submit</button>
       </form>
     </div>
-  </section>
 </main>
   <footer>
     <p>&copy; 2025 Esency. All rights reserved.</p>

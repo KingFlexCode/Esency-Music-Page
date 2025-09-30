@@ -6,9 +6,10 @@
   <link rel="stylesheet" href="../styles/styles.css">
 </head>
 <body>
-  <header>
-    <h1>ESENCY</h1>
-    <nav>
+  <header class="nav-header">
+    <h1 class="esency-logo">ESENCY</h1>
+  
+    <nav class="nav-bar">
       <a href="./home.html" class="active" aria-current="page">Home</a>
       <a href="./blog.html">Blog</a>
       <a href="./merch.html">Merch</a>
@@ -155,11 +156,7 @@
 
       <!-- Honeypot (spam trap) -->
       <input type="text" name="hp_field" style="display:none" tabindex="-1" autocomplete="off" />
-
-      <div>
-        <button class="btn btn--brand" type="submit" id="subscribe-btn">Subscribe</button>
-      </div>
-
+      <button class="btn btn--brand" type="submit" id="subscribe-btn">Subscribe</button>
       <p id="sub-msg" style="margin-top:8px; color: var(--text-dim);"></p>
     </form>
   </div>
