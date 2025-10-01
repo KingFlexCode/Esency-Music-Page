@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Your Cart - Esency</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
+  <style>
+    .cart-container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #111;
+      color: #fff;
+      border: 1px solid var(--brand);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .cart-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .cart-item img {
+      width: 60px;
+      height: 60px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #444;
+    }
+
+    .cart-item .info {
+      flex: 1;
+    }
+
+    .cart-item input {
+      width: 50px;
+      margin: 0 8px;
+    }
+
+    .cart-item button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      padding: 6px 10px;
+    }
+
+    .cart-item button:hover {
+      background: #ffcc00;
+      color: #000;
+    }
+
+    .cart-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .continue-shopping {
+      background: #fff;
+      color: #111;
+      border: 1px solid #ccc;
+      padding: 8px 16px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .continue-shopping:hover {
+      background: #ffcc00;
+      color: #000;
+    }
+
+    #checkout-btn {
+      margin-top: 10px;
+      padding: 12px 20px;
+      font-size: 16px;
+      background: var(--accent, #F76B0A);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    #checkout-btn:hover {
+      background: #ffcc00;
+      color: #000;
+    }
+
+    #empty-message {
+      text-align: center;
+      margin: 20px 0;
+      color: var(--text-dim);
+    }
+
+    @media (max-width: 600px) {
+      .cart-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .cart-item img {
+        width: 100%;
+        height: auto;
+        max-width: 150px;
+      }
+
+      .cart-item .info {
+        width: 100%;
+      }
+
+      .cart-actions {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .continue-shopping {
+        width: 100%;
+        text-align: center;
+      }
+
+      #checkout-btn {
+        width: 100%;
+      }
+
+      #paypal-button-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav-header">
+    <h1 class="esency-logo"><a href="./home.html">ESENCY</a></h1>
+    <nav class="nav-bar">
+      <a href="./home.html">Home</a>
+      <a href="./merch.html">Merch</a>
+      <a href="./music.html">Music</a>
+      <a href="./videos.html">Videos</a>
+      <a href="./links.html">Links</a>
+      <a href="./contact.html">Contact</a>
+      <a href="./cart.html" class="active" aria-current="page">🛒 Cart</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="cart-container">
+      <h2>Your Cart</h2>
+      <div id="empty-message" style="display:none;">Your cart is empty. <a href="./merch.html" style="color:var(--brand);text-decoration:underline;">Continue Shopping</a></div>
+      <div id="cart-items"></div>
+      <div class="cart-actions">
+        <a href="./merch.html" class="continue-shopping">← Continue Shopping</a>
+        <p><strong>Total: $<span id="total-price">0.00</span></strong></p>
+      </div>
+      <button id="checkout-btn">Proceed to Checkout</button>
+      <div id="paypal-button-container" style="margin-top: 20px;"></div>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Esency. All rights reserved.</p>
+  </footer>
+
+  <script>
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    const cartItemsEl = document.getElementById('cart-items');
+    const totalSpan = document.getElementById('total-price');
+    const emptyMsg = document.getElementById('empty-message');
+
+    const productImages = {
+      "red-tee": "../assets/images/Merch/unisex-jersey-t-shirt-red-front-6169a26fc641e.PNG",
+      "white-tee": "../assets/images/Merch/unisex-jersey-t-shirt-white-front-6169a26fd3440.PNG",
+      "grey-tee": "../assets/images/Merch/unisex-jersey-t-shirt-heather-grey-front-6169a26fcf8ca.PNG",
+      "black-hoodie": "../assets/images/Merch/unisex-premium-hoodie-black-front-6169a2cf546a4.PNG",
+      "white-hoodie": "../assets/images/Merch/unisex-premium-hoodie-white-front-6169a2cf57b3b.PNG",
+      "grey-hoodie": "../assets/images/Merch/unisex-premium-hoodie-carbon-grey-front-6169a2cf56944.PNG"
+    };
+
+    function renderCart() {
+      cartItemsEl.innerHTML = '';
+      let total = 0;
+
+      if (cart.length === 0) {
+        emptyMsg.style.display = 'block';
+      } else {
+        emptyMsg.style.display = 'none';
+      }
+
+      cart.forEach((item, index) => {
+        const qty = item.quantity || 1;
+        cart[index].quantity = qty;
+        total += item.price * qty;
+
+        const imgSrc = productImages[item.productId] || '../assets/images/default.png';
+
+        cartItemsEl.innerHTML += `
+          <div class="cart-item">
+            <img src="${imgSrc}" alt="${item.name}" />
+            <div class="info">
+              <strong>${item.name}</strong><br>
+              Size: ${item.size}
+            </div>
+            <input type="number" min="1" value="${qty}" data-index="${index}" class="qty-input">
+            <span>$${(item.price * qty).toFixed(2)}</span>
+            <button data-index="${index}" class="remove-btn">X</button>
+          </div>`;
+      });
+
+      totalSpan.textContent = total.toFixed(2);
+      localStorage.setItem('cart', JSON.stringify(cart));
+    }
+
+    cartItemsEl.addEventListener('input', (e) => {
+      if (e.target.classList.contains('qty-input')) {
+        const index = e.target.dataset.index;
+        const newQty = parseInt(e.target.value) || 1;
+        cart[index].quantity = newQty;
+        renderCart();
+      }
+    });
+
+    cartItemsEl.addEventListener('click', (e) => {
+      if (e.target.classList.contains('remove-btn')) {
+        const index = e.target.dataset.index;
+        cart.splice(index, 1);
+        renderCart();
+      }
+    });
+
+    document.getElementById("checkout-btn").addEventListener("click", () => {
+      const paypalContainer = document.getElementById("paypal-button-container");
+      paypalContainer.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+
+    renderCart();
+
+    paypal.Buttons({
+      createOrder: function(data, actions) {
+        const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: total.toFixed(2),
+              currency_code: "USD"
+            },
+            description: "Esency Merch Order"
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          alert('✅ Payment successful! Thank you, ' + details.payer.name.given_name + '.');
+          cart = [];
+          localStorage.removeItem('cart');
+          renderCart();
+        });
+      }
+    }).render('#paypal-button-container');
+  </script>
+</body>
+</html>

@@ -380,6 +380,21 @@ footer {
 #message{
     font-size: 16px;
 }
+
+.cart-link {
+  font-weight: bold;
+  padding: 8px 16px;
+  border-radius: 6px;
+  background-color: #222;
+  color: var(--brand);
+  transition: background 0.3s ease;
+}
+
+.cart-link:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
     .contact-wrapper {
