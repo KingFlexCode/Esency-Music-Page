@@ -1,15 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Thank You!</title>
-  <link rel="stylesheet" href="../styles/styles.css" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Thank you — Esency</title>
+  <link rel="stylesheet" href="../styles/styles.css"/>
+  <style>
+    .wrap{max-width:720px;margin:60px auto;padding:0 16px;text-align:center}
+    .card{background:#111;border-radius:12px;padding:24px}
+    h1{margin-bottom:8px}
+    .muted{opacity:.8}
+    .btn{margin-top:20px;display:inline-block;padding:10px 14px;border-radius:8px;background:#fff;color:#000;font-weight:700;text-decoration:none}
+  </style>
 </head>
 <body>
-  <main class="page-section">
-    <h2>🎉 Thank You for Your Order!</h2>
-    <p>You’ll receive a confirmation email shortly.</p>
-    <a href="./home.html" class="btn btn--brand">Back to Home</a>
+  <main class="wrap">
+    <div class="card">
+      <h1>Thank you for your order!</h1>
+      <p class="muted">We’re getting it made. You’ll receive email updates with tracking.</p>
+      <p id="oid" style="margin-top:12px;font-family:ui-monospace,monospace;"></p>
+      <a class="btn" href="./merch.html">Continue shopping</a>
+    </div>
   </main>
+  <script>
+    const id = sessionStorage.getItem('lastOrderId');
+    if (id) document.getElementById('oid').textContent = 'Order ID: ' + id;
+  </script>
 </body>
 </html>
