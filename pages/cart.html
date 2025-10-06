@@ -58,6 +58,13 @@
     <div class="checkout-container" id="checkout" style="display:none;">
       <div id="paypal-button-container"></div>
     </div>
+    <div class="checkout-container" style="margin: 24px 0;">
+  <button id="printify-test-btn"
+          style="padding:12px 16px;border:none;border-radius:8px;font-weight:700;background:#111;color:#fff;cursor:pointer;">
+    Send to Printify (Test)
+  </button>
+</div>
+
   </main>
 
   <footer>
@@ -149,6 +156,69 @@
       'grey-hoodie':  { label: 'Grey Hoodie',  product_id: 6666666, variants: { S: 66661, M: 66662, L: 66663, XL: 66664, XXL: 66665 } }
     };
 
+        // ---- Helper: turn cart items into Printify line_items using PRODUCT_MAP ----
+    function mapCartToPrintifyItems(cartItems) {
+      const out = [];
+      for (const i of cartItems) {
+        const map = PRODUCT_MAP?.[i.productId];     // safe lookup
+        if (!map) continue;                         // skip if product not mapped yet
+        const variantId = map.variants?.[i.size];
+        if (!variantId) continue;                   // skip if that size isn't mapped yet
+        out.push({
+          product_id: map.product_id || undefined,
+          variant_id: Number(variantId),
+          quantity: Number(i.quantity || 1)
+        });
+      }
+      return out;
+    }
+
+
+    // ---- Click: send a simple test order to your Netlify Function (no PayPal yet) ----
+    const testBtn = document.getElementById('printify-test-btn');
+    if (testBtn) {
+      testBtn.addEventListener('click', async () => {
+        try {
+          const items = mapCartToPrintifyItems(cart);
+          if (!items.length) {
+            alert('No mappable items in cart yet. Add a White or Red tee (with size) first.');
+            return;
+          }
+
+          // Temporary test shipping info (we’ll replace with real buyer data later)
+          const customer = {
+            first_name: 'Test',
+            last_name:  'Buyer',
+            email: 'test@example.com',
+            address1: '123 Main St',
+            city: 'Bronx',
+            region: 'NY',
+            zip: '10467',
+            country: 'US'
+          };
+
+          // Call your function that already creates a DRAFT order
+          const resp = await fetch('/.netlify/functions/create-printify-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items, customer })
+          });
+
+          const data = await resp.json();
+          console.log('Printify (test) response:', data);
+
+          if (resp.ok && data.id) {
+            alert('✅ Draft order created in Printify!\nOrder ID: ' + data.id);
+          } else {
+            alert('❌ Error from Printify:\n' + (data.message || JSON.stringify(data)));
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Unexpected error. See console for details.');
+        }
+      });
+    }
+
     // ---------- PAYPAL BUTTONS ----------
     paypal.Buttons({
       createOrder: function (data, actions) {
@@ -210,6 +280,41 @@
           items: line_items
         };
 
+        // Map your site product IDs → Printify variant_ids per size
+        // Use the _same_ data-id values you use in merch.html (red-tee, white-tee, etc.)
+        const PRODUCT_MAP = {
+          'white-tee': {
+            label: 'Nada Personal Red Lips T-shirt (White)',
+            product_id: '616b53408c0a6c6ee86808c0',
+            variants: {
+              S:   17643,
+              M:   17644,
+              L:   17645,
+              XL:  17646,
+              XXL: 17647
+              // '3XL': 17648  // you don't show 3XL in the dropdown—ok to omit
+            }
+          },
+          'red-tee': {
+            label: 'Nada Personal Red Lips T-shirt (Red)',
+            product_id: '616b53408c0a6c6ee86808c0',
+            variants: {
+              S:   17589,
+              M:   17590,
+              L:   17591,
+              XL:  17592,
+              XXL: 17593
+              // '3XL': 17594
+            }
+          },
+
+    // We'll fill these later once you send me their variant IDs:
+    'grey-tee':     { label: 'Grey T-shirt',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
+    'black-hoodie': { label: 'Black Hoodie',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
+    'white-hoodie': { label: 'White Hoodie',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
+    'grey-hoodie':  { label: 'Grey Hoodie',   product_id: '', variants: { S:null,M:null,L:null,XXL:null,XL:null } }
+  };
+        
         // Send to Netlify Function → Printify
         const resp = await fetch('/.netlify/functions/create-printify-order', {
           method: 'POST',
