@@ -394,6 +394,44 @@ footer {
   background-color: var(--accent);
   color: white;
 }
+/* Share bar */
+.share {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+.share a,
+.share button {
+  background: #111;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.share a:hover,
+.share button:hover {
+  background: var(--brand, #ffcf33);
+  color: #000;
+}
+.copy-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  background: #111;
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity .3s, transform .3s;
+  z-index: 9999;
+}
+.copy-toast.show { opacity: 1; transform: translateY(0); }
 
 /* Responsive */
 @media (max-width: 900px) {
