@@ -140,7 +140,7 @@
             <option value="">Select size</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>XXL</option>
           </select>
         </div>
-        <button>Add to Cart</button>
+        <button type="button">Add to Cart</button>
       </div>
     </section>
   </main>
@@ -152,7 +152,9 @@
   <script>
     // Load cart from localStorage
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    document.getElementById('cart-count').textContent = cart.length;
+    document.getElementById('cart-count').textContent =
+    cart.reduce((sum, i) => sum + (i.quantity || 0), 0);
+
 
     function addToCart(productId, name, price, size) {
       // Check if item with same size already in cart -> increase quantity
