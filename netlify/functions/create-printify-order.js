@@ -1,7 +1,4 @@
 // netlify/functions/create-printify-order.js
-// Creates a DRAFT order in your Printify shop.
-// Env vars: PRINTIFY_API_KEY, PRINTIFY_SHOP_ID
-
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'Content-Type',
@@ -10,35 +7,20 @@ const CORS = {
 };
 
 exports.handler = async (event) => {
-  // Preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: CORS, body: '' };
-  }
-
-  // Friendly GET for accidental hits or link clicks
-  if (event.httpMethod === 'GET' || event.httpMethod === 'HEAD') {
-    return {
-      statusCode: 200,
-      headers: CORS,
-      body: JSON.stringify({ ok: true, info: 'POST items+customer to create an order.' })
-    };
-  }
-
-  if (event.httpMethod !== 'POST') {
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS, body: '' };
+  if (event.httpMethod === 'GET' || event.httpMethod === 'HEAD')
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ ok: true, info: 'POST items+customer to create an order.' }) };
+  if (event.httpMethod !== 'POST')
     return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method Not Allowed' }) };
-  }
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { items, customer, external_id } = body;
+    const { items, customer, external_id, send_to_production } = body; // 🔹
 
-    if (!Array.isArray(items) || items.length === 0) {
+    if (!Array.isArray(items) || !items.length)
       return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing items' }) };
-    }
-    if (!customer || !customer.first_name || !customer.last_name || !customer.address1 ||
-        !customer.city || !customer.region || !customer.zip || !customer.country) {
+    if (!customer || !customer.first_name || !customer.last_name || !customer.address1 || !customer.city || !customer.region || !customer.zip || !customer.country)
       return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing customer address fields' }) };
-    }
 
     const payload = {
       external_id: external_id || `ESENCY-TEST-${Date.now()}`,
@@ -53,19 +35,28 @@ exports.handler = async (event) => {
       address_to: customer
     };
 
-    const url = `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`;
+    const shopId = process.env.PRINTIFY_SHOP_ID;
+    const createUrl = `https://api.printify.com/v1/shops/${shopId}/orders.json`;
+    const auth = { Authorization: `Bearer ${process.env.PRINTIFY_API_KEY}`, 'Content-Type': 'application/json' };
 
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
+    // Create order
+    const createRes = await fetch(createUrl, { method: 'POST', headers: auth, body: JSON.stringify(payload) });
+    const created = await createRes.json();
+    if (!createRes.ok) {
+      return { statusCode: createRes.status, headers: CORS, body: JSON.stringify(created) };
+    }
 
-    const data = await res.json();
-    return { statusCode: res.status, headers: CORS, body: JSON.stringify(data) };
+    let sent = null;
+
+    // 🔹 Optionally send to production
+    if (send_to_production && created.id) {
+      const stpUrl = `https://api.printify.com/v1/shops/${shopId}/orders/${created.id}/send_to_production.json`;
+      const stpRes = await fetch(stpUrl, { method: 'POST', headers: auth });
+      sent = await stpRes.json();
+      // even if this fails, we still return what happened
+    }
+
+    return { statusCode: 200, headers: CORS, body: JSON.stringify({ created, sent_to_production: sent }) };
   } catch (err) {
     return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: err.message }) };
   }
