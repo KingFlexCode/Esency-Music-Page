@@ -5,141 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Your Cart - Esency</title>
   <link rel="stylesheet" href="../styles/styles.css" />
-  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_CLIENT_ID&currency=USD"></script>
   <style>
-    .cart-container {
-      max-width: 800px;
-      margin: 40px auto;
-      background: #111;
-      color: #fff;
-      border: 1px solid var(--brand);
-      border-radius: 8px;
-      padding: 20px;
-    }
-
-    .cart-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 12px 0;
-      border-bottom: 1px solid #333;
-    }
-
-    .cart-item img {
-      width: 60px;
-      height: 60px;
-      object-fit: cover;
-      border-radius: 6px;
-      border: 1px solid #444;
-    }
-
-    .cart-item .info {
-      flex: 1;
-    }
-
-    .cart-item input {
-      width: 50px;
-      margin: 0 8px;
-    }
-
-    .cart-item button {
-      background: var(--accent);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      padding: 6px 10px;
-    }
-
-    .cart-item button:hover {
-      background: #ffcc00;
-      color: #000;
-    }
-
-    .cart-actions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 30px;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-
-    .continue-shopping {
-      background: #fff;
-      color: #111;
-      border: 1px solid #ccc;
-      padding: 8px 16px;
-      border-radius: 6px;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .continue-shopping:hover {
-      background: #ffcc00;
-      color: #000;
-    }
-
-    #checkout-btn {
-      margin-top: 10px;
-      padding: 12px 20px;
-      font-size: 16px;
-      background: var(--accent, #F76B0A);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: bold;
-      width: 100%;
-    }
-
-    #checkout-btn:hover {
-      background: #ffcc00;
-      color: #000;
-    }
-
-    #empty-message {
-      text-align: center;
-      margin: 20px 0;
-      color: var(--text-dim);
-    }
-
-    @media (max-width: 600px) {
-      .cart-item {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
-
-      .cart-item img {
-        width: 100%;
-        height: auto;
-        max-width: 150px;
-      }
-
-      .cart-item .info {
-        width: 100%;
-      }
-
-      .cart-actions {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-
-      .continue-shopping {
-        width: 100%;
-        text-align: center;
-      }
-
-      #checkout-btn {
-        width: 100%;
-      }
-
-      #paypal-button-container {
-        width: 100%;
-      }
-    }
+    .cart-wrap {max-width: 960px; margin: 40px auto; padding: 0 16px;}
+    .cart-table {width: 100%; border-collapse: collapse; margin-bottom: 16px;}
+    .cart-table th, .cart-table td {padding: 12px; border-bottom: 1px solid #222;}
+    .qty-btn {padding: 4px 10px; border: 1px solid #444; background:#111; color:#fff; border-radius:6px; cursor: pointer;}
+    .remove-btn {border:none; background:transparent; color:#f66; cursor:pointer;}
+    .totals {display:flex; justify-content:flex-end; gap:24px; font-weight:700; margin: 16px 0;}
+    .checkout-container {display:flex; justify-content:flex-end; margin: 24px 0;}
+    .empty {text-align:center; padding: 40px 0; opacity: 0.8;}
   </style>
 </head>
 <body>
@@ -147,26 +21,42 @@
     <h1 class="esency-logo"><a href="./home.html">ESENCY</a></h1>
     <nav class="nav-bar">
       <a href="./home.html">Home</a>
+      <a href="./blog.html">Blog</a>
       <a href="./merch.html">Merch</a>
       <a href="./music.html">Music</a>
       <a href="./videos.html">Videos</a>
       <a href="./links.html">Links</a>
+      <a href="./bio.html">Bio</a>
       <a href="./contact.html">Contact</a>
-      <a href="./cart.html" class="active" aria-current="page">🛒 Cart</a>
+      <a href="./cart.html" id="cart-button" class="cart-link">🛒 Cart (<span id="cart-count">0</span>)</a>
     </nav>
   </header>
 
-  <main>
-    <div class="cart-container">
-      <h2>Your Cart</h2>
-      <div id="empty-message" style="display:none;">Your cart is empty. <a href="./merch.html" style="color:var(--brand);text-decoration:underline;">Continue Shopping</a></div>
-      <div id="cart-items"></div>
-      <div class="cart-actions">
-        <a href="./merch.html" class="continue-shopping">← Continue Shopping</a>
-        <p><strong>Total: $<span id="total-price">0.00</span></strong></p>
-      </div>
-      <button id="checkout-btn">Proceed to Checkout</button>
-      <div id="paypal-button-container" style="margin-top: 20px;"></div>
+  <main class="cart-wrap">
+    <h1>Your Cart</h1>
+
+    <table class="cart-table" id="cart-table" style="display:none;">
+      <thead>
+        <tr>
+          <th style="text-align:left;">Item</th>
+          <th>Size</th>
+          <th>Price</th>
+          <th>Qty</th>
+          <th>Total</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cart-rows"></tbody>
+    </table>
+
+    <p id="empty" class="empty">Your cart is empty.</p>
+
+    <div class="totals" id="totals" style="display:none;">
+      <div>Subtotal: $<span id="subtotal">0.00</span></div>
+    </div>
+
+    <div class="checkout-container" id="checkout" style="display:none;">
+      <div id="paypal-button-container"></div>
     </div>
   </main>
 
@@ -174,99 +64,173 @@
     <p>&copy; 2025 Esency. All rights reserved.</p>
   </footer>
 
+  <!-- PayPal JS SDK (use SANDBOX while testing; switch to Live when ready) -->
+  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_SANDBOX_CLIENT_ID&currency=USD"></script>
+
   <script>
+    // ---------- CART RENDER ----------
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
-    const cartItemsEl = document.getElementById('cart-items');
-    const totalSpan = document.getElementById('total-price');
-    const emptyMsg = document.getElementById('empty-message');
+    const cartCount = () => cart.reduce((sum, i) => sum + i.quantity, 0);
+    const save = () => localStorage.setItem('cart', JSON.stringify(cart));
+    document.getElementById('cart-count').textContent = cartCount();
 
-    const productImages = {
-      "red-tee": "../assets/images/Merch/unisex-jersey-t-shirt-red-front-6169a26fc641e.PNG",
-      "white-tee": "../assets/images/Merch/unisex-jersey-t-shirt-white-front-6169a26fd3440.PNG",
-      "grey-tee": "../assets/images/Merch/unisex-jersey-t-shirt-heather-grey-front-6169a26fcf8ca.PNG",
-      "black-hoodie": "../assets/images/Merch/unisex-premium-hoodie-black-front-6169a2cf546a4.PNG",
-      "white-hoodie": "../assets/images/Merch/unisex-premium-hoodie-white-front-6169a2cf57b3b.PNG",
-      "grey-hoodie": "../assets/images/Merch/unisex-premium-hoodie-carbon-grey-front-6169a2cf56944.PNG"
-    };
+    const $rows = document.getElementById('cart-rows');
+    const $table = document.getElementById('cart-table');
+    const $empty = document.getElementById('empty');
+    const $totals = document.getElementById('totals');
+    const $subtotal = document.getElementById('subtotal');
+    const $checkout = document.getElementById('checkout');
 
-    function renderCart() {
-      cartItemsEl.innerHTML = '';
-      let total = 0;
-
-      if (cart.length === 0) {
-        emptyMsg.style.display = 'block';
-      } else {
-        emptyMsg.style.display = 'none';
+    function render() {
+      if (!cart.length) {
+        $table.style.display = 'none';
+        $totals.style.display = 'none';
+        $checkout.style.display = 'none';
+        $empty.style.display = 'block';
+        document.getElementById('cart-count').textContent = '0';
+        return;
       }
 
-      cart.forEach((item, index) => {
-        const qty = item.quantity || 1;
-        cart[index].quantity = qty;
-        total += item.price * qty;
+      $empty.style.display = 'none';
+      $table.style.display = '';
+      $totals.style.display = '';
+      $checkout.style.display = '';
 
-        const imgSrc = productImages[item.productId] || '../assets/images/default.png';
+      $rows.innerHTML = cart.map((i, idx) => `
+        <tr>
+          <td style="text-align:left;">${i.name}</td>
+          <td style="text-align:center;">${i.size || '-'}</td>
+          <td style="text-align:center;">$${i.price.toFixed(2)}</td>
+          <td style="text-align:center;">
+            <button class="qty-btn" data-idx="${idx}" data-op="-">–</button>
+            <span style="display:inline-block; min-width:24px; text-align:center;">${i.quantity}</span>
+            <button class="qty-btn" data-idx="${idx}" data-op="+">+</button>
+          </td>
+          <td style="text-align:center;">$${(i.price * i.quantity).toFixed(2)}</td>
+          <td style="text-align:center;"><button class="remove-btn" data-remove="${idx}">Remove</button></td>
+        </tr>
+      `).join('');
 
-        cartItemsEl.innerHTML += `
-          <div class="cart-item">
-            <img src="${imgSrc}" alt="${item.name}" />
-            <div class="info">
-              <strong>${item.name}</strong><br>
-              Size: ${item.size}
-            </div>
-            <input type="number" min="1" value="${qty}" data-index="${index}" class="qty-input">
-            <span>$${(item.price * qty).toFixed(2)}</span>
-            <button data-index="${index}" class="remove-btn">X</button>
-          </div>`;
-      });
-
-      totalSpan.textContent = total.toFixed(2);
-      localStorage.setItem('cart', JSON.stringify(cart));
+      const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
+      $subtotal.textContent = total.toFixed(2);
+      document.getElementById('cart-count').textContent = cartCount();
     }
 
-    cartItemsEl.addEventListener('input', (e) => {
-      if (e.target.classList.contains('qty-input')) {
-        const index = e.target.dataset.index;
-        const newQty = parseInt(e.target.value) || 1;
-        cart[index].quantity = newQty;
-        renderCart();
+    document.body.addEventListener('click', (e) => {
+      const minus = e.target.matches('.qty-btn[data-op="-"]');
+      const plus  = e.target.matches('.qty-btn[data-op="+"]');
+      const remove = e.target.matches('[data-remove]');
+
+      if (minus || plus) {
+        const idx = Number(e.target.getAttribute('data-idx'));
+        cart[idx].quantity += plus ? 1 : -1;
+        if (cart[idx].quantity <= 0) cart.splice(idx, 1);
+        save(); render();
+      }
+
+      if (remove) {
+        const idx = Number(e.target.getAttribute('data-remove'));
+        cart.splice(idx, 1);
+        save(); render();
       }
     });
 
-    cartItemsEl.addEventListener('click', (e) => {
-      if (e.target.classList.contains('remove-btn')) {
-        const index = e.target.dataset.index;
-        cart.splice(index, 1);
-        renderCart();
-      }
-    });
+    render();
 
-    document.getElementById("checkout-btn").addEventListener("click", () => {
-      const paypalContainer = document.getElementById("paypal-button-container");
-      paypalContainer.scrollIntoView({ behavior: "smooth", block: "center" });
-    });
+    // ---------- PRODUCT → PRINTIFY VARIANT MAP ----------
+    // Replace variant_id values with YOUR real Printify variant IDs for each size.
+    // Tip: In Printify, open the product, check the Variants list, or use the Products API.
+    const PRODUCT_MAP = {
+      'red-tee':   { label: 'Red T-shirt',   product_id: 1111111, variants: { S: 11111, M: 11112, L: 11113, XL: 11114, XXL: 11115 } },
+      'white-tee': { label: 'White T-shirt', product_id: 2222222, variants: { S: 22221, M: 22222, L: 22223, XL: 22224, XXL: 22225 } },
+      'grey-tee':  { label: 'Grey T-shirt',  product_id: 3333333, variants: { S: 33331, M: 33332, L: 33333, XL: 33334, XXL: 33335 } },
+      'black-hoodie': { label: 'Black Hoodie', product_id: 4444444, variants: { S: 44441, M: 44442, L: 44443, XL: 44444, XXL: 44445 } },
+      'white-hoodie': { label: 'White Hoodie', product_id: 5555555, variants: { S: 55551, M: 55552, L: 55553, XL: 55554, XXL: 55555 } },
+      'grey-hoodie':  { label: 'Grey Hoodie',  product_id: 6666666, variants: { S: 66661, M: 66662, L: 66663, XL: 66664, XXL: 66665 } }
+    };
 
-    renderCart();
-
+    // ---------- PAYPAL BUTTONS ----------
     paypal.Buttons({
-      createOrder: function(data, actions) {
-        const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      createOrder: function (data, actions) {
+        const total = cart.reduce((sum, i) => sum + i.price * i.quantity, 0);
         return actions.order.create({
-          purchase_units: [{
-            amount: {
-              value: total.toFixed(2),
-              currency_code: "USD"
-            },
-            description: "Esency Merch Order"
-          }]
+          application_context: {
+            shipping_preference: 'GET_FROM_FILE' // ask PayPal for buyer's shipping
+          },
+          purchase_units: [
+            {
+              amount: { value: total.toFixed(2) }
+            }
+          ]
         });
       },
-      onApprove: function(data, actions) {
-        return actions.order.capture().then(function(details) {
-          alert('✅ Payment successful! Thank you, ' + details.payer.name.given_name + '.');
-          cart = [];
-          localStorage.removeItem('cart');
-          renderCart();
+
+      onApprove: async function (data, actions) {
+        const order = await actions.order.capture();
+
+        // Pull buyer + shipping from PayPal capture
+        const pu = (order.purchase_units && order.purchase_units[0]) || {};
+        const ship = pu.shipping || {};
+        const address = ship.address || {};
+        const fullName = (ship.name && ship.name.full_name) || (order.payer && (order.payer.name?.given_name + ' ' + order.payer.name?.surname)) || 'Esency Fan';
+        const [first_name, ...rest] = fullName.split(' ');
+        const last_name = rest.join(' ') || 'Customer';
+
+        // Build Printify line_items from cart
+        const line_items = cart.map(i => {
+          const map = PRODUCT_MAP[i.productId];
+          const variant_id = map?.variants?.[i.size];
+          return {
+            product_id: map?.product_id,     // optional but nice for reference
+            variant_id: Number(variant_id),  // REQUIRED by Printify
+            quantity: i.quantity
+          };
         });
+
+        // Quick validation
+        if (line_items.some(li => !li.variant_id)) {
+          alert('One or more products are missing Printify variant IDs. Please configure PRODUCT_MAP.');
+          return;
+        }
+
+        const orderData = {
+          orderId: order.id,
+          customer: {
+            first_name,
+            last_name,
+            email: order.payer?.email_address || '',
+            phone: '', // optional — can be collected with your own form
+            address1: address.address_line_1 || '',
+            address2: address.address_line_2 || '',
+            city: address.admin_area_2 || '',    // city
+            region: address.admin_area_1 || '',  // state/region
+            zip: address.postal_code || '',
+            country: address.country_code || 'US'
+          },
+          items: line_items
+        };
+
+        // Send to Netlify Function → Printify
+        const resp = await fetch('/.netlify/functions/create-printify-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(orderData)
+        });
+
+        const result = await resp.json();
+        console.log('Printify response:', result);
+
+        if (resp.ok && (result.id || result.status)) {
+          localStorage.removeItem('cart');
+          window.location.href = './thankyou.html';
+        } else {
+          alert('Payment captured, but failed to send order to Printify. Please contact support.');
+        }
+      },
+
+      onError: function (err) {
+        console.error('PayPal error', err);
+        alert('Checkout error. Please try again.');
       }
     }).render('#paypal-button-container');
   </script>
