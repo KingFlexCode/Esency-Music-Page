@@ -20,16 +20,18 @@ exports.handler = async (event) => {
       return { statusCode: 400, body: 'Missing customer address fields' };
     }
 
+    // inside your payload:
     const payload = {
-      external_id: external_id || `ESENCY-TEST-${Date.now()}`,
-      label: 'Esency Merch Order',
-      line_items: items.map(i => ({
+    external_id: external_id || `ESENCY-TEST-${Date.now()}`,
+    label: 'Esency Merch Order',
+    line_items: items.map(i => ({
+        product_id: i.product_id ? String(i.product_id) : undefined, // 👈 add product_id if provided
         variant_id: Number(i.variant_id),
         quantity: Number(i.quantity || 1)
-      })),
-      shipping_method: 1,                // standard
-      send_shipping_notification: false, // keep quiet for tests
-      address_to: customer
+    })),
+    shipping_method: 1,
+    send_shipping_notification: false,
+    address_to: customer
     };
 
     const url = `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`;
