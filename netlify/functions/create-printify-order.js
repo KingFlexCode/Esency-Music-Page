@@ -61,7 +61,7 @@ exports.handler = async (event) => {
         quantity: Number(i.quantity || 1)
       })),
       shipping_method: 1,
-      send_shipping_notification: false,
+      send_shipping_notification: true,
       address_to: customer
     };
 
