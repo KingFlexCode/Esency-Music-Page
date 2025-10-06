@@ -56,6 +56,22 @@ exports.handler = async (event) => {
       // even if this fails, we still return what happened
     }
 
+    if (resp.ok && (result.created?.id)) {
+  const sent = result.sent_to_production;
+  if (sent?.id || sent?.status === 'submitted' || sent?.status === 'pending') {
+    localStorage.removeItem('cart');
+    window.location.href = './thankyou.html';
+  } else if (sent && (sent.error || sent.message)) {
+    alert('✅ Draft created, but not sent to production:\n' + JSON.stringify(sent));
+  } else {
+    // Draft only
+    localStorage.removeItem('cart');
+    window.location.href = './thankyou.html';
+  }
+} else {
+  alert('Payment captured, but failed to send order to Printify:\n' + (result.message || JSON.stringify(result)));
+}
+
     return { statusCode: 200, headers: CORS, body: JSON.stringify({ created, sent_to_production: sent }) };
   } catch (err) {
     return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: err.message }) };

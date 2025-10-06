@@ -192,34 +192,45 @@
   }
 
   // ---------------- TEST BUTTON -> DRAFT ORDER ----------------
-  const testBtn = document.getElementById('printify-test-btn');
-  if (testBtn) {
-    testBtn.addEventListener('click', async () => {
-      try {
-        const items = mapCartToPrintifyItems(cart);
-        if (!items.length) { alert('Add a White or Red tee with a size first.'); return; }
+    const testBtn = document.getElementById('printify-test-btn');
+    if (testBtn) {
+      testBtn.addEventListener('click', async () => {
+        try {
+          const items = mapCartToPrintifyItems(cart);
+          if (!items.length) { alert('Add a White or Red tee with a size first.'); return; }
 
-        const customer = {
-          first_name: 'Test', last_name: 'Buyer', email: 'test@example.com',
-          address1: '123 Main St', city: 'Bronx', region: 'NY', zip: '10467', country: 'US'
-        };
+          const customer = {
+            first_name: 'Test', last_name: 'Buyer', email: 'test@example.com',
+            address1: '123 Main St', city: 'Bronx', region: 'NY', zip: '10467', country: 'US'
+          };
 
-        const resp = await fetch('/.netlify/functions/create-printify-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items, customer })
-        });
-        const data = await resp.json();
-        console.log('Printify (test) response:', data);
+          const resp = await fetch('/.netlify/functions/create-printify-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ items, customer, send_to_production: true })
+          });
+          const data = await resp.json();
+          console.log('Printify (test) response:', data);
 
-        if (resp.ok && data.id) alert('✅ Draft order created! ID: ' + data.id);
-        else alert('❌ Error from Printify:\n' + (data.message || JSON.stringify(data)));
-      } catch (err) {
-        console.error(err);
-        alert('Unexpected error. See console.');
-      }
-    });
-  }
+          if (resp.ok && (data.created?.id)) {
+            const sent = data.sent_to_production;
+            if (sent?.id || sent?.status === 'submitted' || sent?.status === 'pending') {
+              alert('✅ Order sent to production!\nOrder ID: ' + data.created.id);
+            } else if (sent && (sent.error || sent.message)) {
+              alert('✅ Draft created, but not sent to production:\n' + JSON.stringify(sent));
+            } else {
+              alert('✅ Draft created (not sent to production).\nOrder ID: ' + data.created.id);
+            }
+          } else {
+            alert('❌ Error from Printify:\n' + (data.message || JSON.stringify(data)));
+          }
+        } catch (err) {
+          console.error(err);
+          alert('Unexpected error. See console.');
+        }
+      });
+    }
+
 
   // ---------------- PAYPAL BUTTONS ----------------
   paypal.Buttons({
@@ -266,24 +277,28 @@
       };
 
       const resp = await fetch('/.netlify/functions/create-printify-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        items,
-        customer,
-        send_to_production: true   // ← add this
-      })
-    });
-
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderData)
+      });
 
       const result = await resp.json();
       console.log('Printify response:', result);
 
-      if (resp.ok && (result.id || result.status)) {
-        localStorage.removeItem('cart');
-        window.location.href = './thankyou.html';
+      if (resp.ok && (result.created?.id)) {
+        const sent = result.sent_to_production;
+        if (sent?.id || sent?.status === 'submitted' || sent?.status === 'pending') {
+          localStorage.removeItem('cart');
+          window.location.href = './thankyou.html';
+        } else if (sent && (sent.error || sent.message)) {
+          alert('✅ Draft created, but not sent to production:\n' + JSON.stringify(sent));
+        } else {
+          // Draft only
+          localStorage.removeItem('cart');
+          window.location.href = './thankyou.html';
+        }
       } else {
-        alert('Payment captured, but failed to send order to Printify.');
+        alert('Payment captured, but failed to send order to Printify:\n' + (result.message || JSON.stringify(result)));
       }
     },
 
