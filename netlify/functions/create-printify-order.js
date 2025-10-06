@@ -1,14 +1,60 @@
 // netlify/functions/create-printify-order.js
+// Creates a DRAFT order in your Printify shop.
+// Needs env vars set in Netlify: PRINTIFY_API_KEY and PRINTIFY_SHOP_ID
+
 exports.handler = async (event) => {
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const body = JSON.parse(event.body || '{}');
+  try {
+    const body = JSON.parse(event.body || '{}');
+    const { items, customer, external_id } = body;
 
-  return {
-    statusCode: 200,
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ok: true, received: body })
-  };
+    // Minimal validation (keeps errors clear)
+    if (!Array.isArray(items) || items.length === 0) {
+      return { statusCode: 400, body: 'Missing items' };
+    }
+    if (!customer || !customer.first_name || !customer.last_name || !customer.address1 ||
+        !customer.city || !customer.region || !customer.zip || !customer.country) {
+      return { statusCode: 400, body: 'Missing customer address fields' };
+    }
+
+    const payload = {
+      external_id: external_id || `ESENCY-TEST-${Date.now()}`,
+      label: 'Esency Merch Order',
+      line_items: items.map(i => ({
+        variant_id: Number(i.variant_id),
+        quantity: Number(i.quantity || 1)
+      })),
+      shipping_method: 1,                // standard
+      send_shipping_notification: false, // keep quiet for tests
+      address_to: customer
+    };
+
+    const url = `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`;
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.PRINTIFY_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+
+    return {
+      statusCode: res.status,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    };
+  } catch (err) {
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ error: err.message })
+    };
+  }
 };
