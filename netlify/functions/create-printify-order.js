@@ -2,18 +2,30 @@
 // Creates a DRAFT order in your Printify shop.
 // Env vars: PRINTIFY_API_KEY, PRINTIFY_SHOP_ID
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Content-Type': 'application/json'
+};
+
 exports.handler = async (event) => {
-  // 👇 Handle accidental GET/HEAD nicely (no 405 spam in the console)
+  // Preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers: CORS, body: '' };
+  }
+
+  // Friendly GET for accidental hits or link clicks
   if (event.httpMethod === 'GET' || event.httpMethod === 'HEAD') {
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: CORS,
       body: JSON.stringify({ ok: true, info: 'POST items+customer to create an order.' })
     };
   }
 
   if (event.httpMethod !== 'POST') {
-    return { statusCode: 405, body: 'Method Not Allowed' };
+    return { statusCode: 405, headers: CORS, body: JSON.stringify({ error: 'Method Not Allowed' }) };
   }
 
   try {
@@ -21,11 +33,11 @@ exports.handler = async (event) => {
     const { items, customer, external_id } = body;
 
     if (!Array.isArray(items) || items.length === 0) {
-      return { statusCode: 400, body: 'Missing items' };
+      return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing items' }) };
     }
     if (!customer || !customer.first_name || !customer.last_name || !customer.address1 ||
         !customer.city || !customer.region || !customer.zip || !customer.country) {
-      return { statusCode: 400, body: 'Missing customer address fields' };
+      return { statusCode: 400, headers: CORS, body: JSON.stringify({ error: 'Missing customer address fields' }) };
     }
 
     const payload = {
@@ -42,6 +54,7 @@ exports.handler = async (event) => {
     };
 
     const url = `https://api.printify.com/v1/shops/${process.env.PRINTIFY_SHOP_ID}/orders.json`;
+
     const res = await fetch(url, {
       method: 'POST',
       headers: {
@@ -52,16 +65,8 @@ exports.handler = async (event) => {
     });
 
     const data = await res.json();
-    return {
-      statusCode: res.status,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data)
-    };
+    return { statusCode: res.status, headers: CORS, body: JSON.stringify(data) };
   } catch (err) {
-    return {
-      statusCode: 500,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ error: err.message })
-    };
+    return { statusCode: 500, headers: CORS, body: JSON.stringify({ error: err.message }) };
   }
 };
