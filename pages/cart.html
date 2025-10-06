@@ -72,7 +72,7 @@
   </footer>
 
   <!-- PayPal JS SDK (use SANDBOX while testing; switch to Live when ready) -->
-  <script src="https://www.paypal.com/sdk/js?client-id=YOUR_PAYPAL_SANDBOX_CLIENT_ID&currency=USD"></script>
+  <script src="https://www.paypal.com/sdk/js?client-id=AQH2Ku3FflhcXZiE93-33wunMJIZERUtZfRvKGN8TGpo4MsGXTs4X7mmBI3zqoBrBf5PAQnrMCEuDgZY&currency=USD"></script>
 
   <script>
     // ---------- CART RENDER ----------
@@ -144,26 +144,24 @@
 
     render();
 
-    // ---------- PRODUCT → PRINTIFY VARIANT MAP ----------
-    // Replace variant_id values with YOUR real Printify variant IDs for each size.
-    // Tip: In Printify, open the product, check the Variants list, or use the Products API.
-    const PRODUCT_MAP = {
-      'red-tee':   { label: 'Red T-shirt',   product_id: 1111111, variants: { S: 11111, M: 11112, L: 11113, XL: 11114, XXL: 11115 } },
-      'white-tee': { label: 'White T-shirt', product_id: 2222222, variants: { S: 22221, M: 22222, L: 22223, XL: 22224, XXL: 22225 } },
-      'grey-tee':  { label: 'Grey T-shirt',  product_id: 3333333, variants: { S: 33331, M: 33332, L: 33333, XL: 33334, XXL: 33335 } },
-      'black-hoodie': { label: 'Black Hoodie', product_id: 4444444, variants: { S: 44441, M: 44442, L: 44443, XL: 44444, XXL: 44445 } },
-      'white-hoodie': { label: 'White Hoodie', product_id: 5555555, variants: { S: 55551, M: 55552, L: 55553, XL: 55554, XXL: 55555 } },
-      'grey-hoodie':  { label: 'Grey Hoodie',  product_id: 6666666, variants: { S: 66661, M: 66662, L: 66663, XL: 66664, XXL: 66665 } }
-    };
-
         // ---- Helper: turn cart items into Printify line_items using PRODUCT_MAP ----
     function mapCartToPrintifyItems(cartItems) {
+      const mapSrc = window.PRODUCT_MAP || PRODUCT_MAP || {};
       const out = [];
+
       for (const i of cartItems) {
-        const map = PRODUCT_MAP?.[i.productId];     // safe lookup
-        if (!map) continue;                         // skip if product not mapped yet
-        const variantId = map.variants?.[i.size];
-        if (!variantId) continue;                   // skip if that size isn't mapped yet
+        const key = (i.productId || '').trim();           // guard against stray spaces
+        const size = (i.size || '').toUpperCase();         // normalize (e.g., "xxl" -> "XXL")
+        const map = mapSrc[key];
+
+        if (!map) { console.warn('No product map for:', key, i); continue; }
+
+        // accept both "XXL" and "2XL"
+        const normalizedSize = size === '2XL' ? 'XXL' : size;
+        const variantId = map.variants?.[normalizedSize];
+
+        if (!variantId) { console.warn('No variant for:', key, 'size:', normalizedSize, i); continue; }
+
         out.push({
           product_id: map.product_id || undefined,
           variant_id: Number(variantId),
@@ -172,6 +170,7 @@
       }
       return out;
     }
+
 
 
     // ---- Click: send a simple test order to your Netlify Function (no PayPal yet) ----
@@ -314,7 +313,28 @@
     'white-hoodie': { label: 'White Hoodie',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
     'grey-hoodie':  { label: 'Grey Hoodie',   product_id: '', variants: { S:null,M:null,L:null,XXL:null,XL:null } }
   };
-        
+   
+
+    // One single, global product map
+    window.PRODUCT_MAP = {
+      'white-tee': {
+        label: 'Nada Personal Red Lips T-shirt (White)',
+        product_id: '616b53408c0a6c6ee86808c0',
+        variants: { S:17643, M:17644, L:17645, XL:17646, XXL:17647 }
+      },
+      'red-tee': {
+        label: 'Nada Personal Red Lips T-shirt (Red)',
+        product_id: '616b53408c0a6c6ee86808c0',
+        variants: { S:17589, M:17590, L:17591, XL:17592, XXL:17593 }
+      },
+
+      // placeholders (we’ll fill later)
+      'grey-tee':     { label: 'Grey T-shirt',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
+      'black-hoodie': { label: 'Black Hoodie',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
+      'white-hoodie': { label: 'White Hoodie',  product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } },
+      'grey-hoodie':  { label: 'Grey Hoodie',   product_id: '', variants: { S:null,M:null,L:null,XL:null,XXL:null } }
+    };
+
         // Send to Netlify Function → Printify
         const resp = await fetch('/.netlify/functions/create-printify-order', {
           method: 'POST',
