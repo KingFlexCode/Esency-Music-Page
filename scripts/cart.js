@@ -3,6 +3,7 @@
    ========================================================== */
 
 import { loadCart, saveCart, getCartCount, updateCartCountDisplay } from "./cart-utils.js";
+import { mapCartToPrintifyItems, sendPrintifyOrder } from "./printify-api.js";
 
 // Load cart
 let cart = loadCart();
