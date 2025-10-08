@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Failed — Esency</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+  <style>
+    body {
+      background: var(--black);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 0 16px;
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .card {
+      background: var(--near-black);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 40px 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 32px;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .muted {
+      color: var(--text-dim);
+      font-size: 16px;
+    }
+
+    #err-msg {
+      margin-top: 16px;
+      background: #000;
+      color: var(--brand);
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-family: ui-monospace, monospace;
+      max-width: 90%;
+      word-break: break-word;
+    }
+
+    .btns {
+      margin-top: 28px;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #222;
+      color: var(--text);
+      border: 1px solid var(--line);
+    }
+
+    .btn-secondary:hover {
+      background: #333;
+      color: var(--brand);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <div class="card">
+      <h1>Order Failed</h1>
+      <p class="muted">Something went wrong while processing your order.</p>
+      <p class="muted">You can retry checkout or contact support for help.</p>
+      <p id="err-msg" style="display:none;"></p>
+
+      <div class="btns">
+        <a class="btn btn-primary" href="./cart.html">Retry Checkout</a>
+        <a class="btn btn-secondary" href="./contact.html">Contact Support</a>
+      </div>
+    </div>
+  </main>
+
+  <script type="module">
+    import { loadCart } from "../scripts/cart-utils.js";
+
+    // Keep the cart intact so user can retry checkout
+    const error = sessionStorage.getItem("lastOrderError");
+    if (error) {
+      const el = document.getElementById("err-msg");
+      el.textContent = "Error: " + error;
+      el.style.display = "inline-block";
+      sessionStorage.removeItem("lastOrderError");
+    }
+
+    // Optional: log for debugging
+    console.log("Cart items on failure:", loadCart());
+  </script>
+</body>
+</html>

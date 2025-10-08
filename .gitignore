@@ -11,5 +11,9 @@ node_modules/
 dist/
 build/
 
+# API Keys
+./api.txt
+.env
+.env.*
 
 git rm -r --cached .DS_Store

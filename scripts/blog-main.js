@@ -1,5 +1,13 @@
-// ====== 1) YOUR POSTS DATA (add/remove freely) ======
-// date: ISO (YYYY-MM-DD) — grouping uses year+month
+/* =========================================================================
+   Esency Blog – Main List Page
+   - Posts data (edit freely)
+   - Utilities
+   - Grouping, Archive render
+   - Post cards + Main render
+   - Routing (hash month + search)
+   ======================================================================= */
+
+/* ===== 1) POSTS DATA (add/remove freely) ===== */
 const posts = [
   {
     id: "the-power-of-writing-and-producing-your-own-music",
@@ -30,82 +38,91 @@ const posts = [
   }
 ];
 
-// ====== 2) UTILITIES ======
-const $ = (sel, all=false, root=document) => all ? Array.from(root.querySelectorAll(sel)) : root.querySelector(sel);
-const fmtMonth = (d) => new Date(d+"T12:00:00"); // avoid TZ shift
-const monthKey = (d) => {
-  const dt = fmtMonth(d); return `${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}`;
+/* ===== 2) UTILITIES ===== */
+const $  = (sel, root = document) => root.querySelector(sel);
+const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+
+const safeDate = (iso) => new Date(`${iso}T12:00:00`); // avoid TZ shifts
+const monthKey  = (iso) => {
+  const d = safeDate(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
 };
 const monthLabel = (key) => {
-  const [y,m] = key.split('-').map(Number);
-  return new Date(y, m-1, 1).toLocaleString(undefined,{ month:'long', year:'numeric' });
+  const [y, m] = key.split("-").map(Number);
+  return new Date(y, m - 1, 1).toLocaleString(undefined, { month: "long", year: "numeric" });
 };
 
-// Local-only view counter (per-visitor). For global counts, plug into a backend later.
+const debounce = (fn, ms = 150) => {
+  let t; return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+};
+
+/* Local-only (per-visitor) view counter */
 const viewStore = {
-  key: 'esency_blog_views',
+  key: "esency_blog_views",
   cache: null,
-  _load(){
-    if(this.cache) return this.cache;
-    try{ this.cache = JSON.parse(localStorage.getItem(this.key) || '{}'); }
-    catch(e){ this.cache = {}; }
+  _load() {
+    if (this.cache) return this.cache;
+    try { this.cache = JSON.parse(localStorage.getItem(this.key) || "{}"); }
+    catch { this.cache = {}; }
     return this.cache;
   },
-  _save(){ localStorage.setItem(this.key, JSON.stringify(this.cache||{})); },
-  get(id){ return (this._load()[id] ?? 0); },
-  set(id, n){ this._load()[id] = n; this._save(); return n; },
-  increment(id){ const v = this.get(id)+1; return this.set(id, v); }
+  _save() { localStorage.setItem(this.key, JSON.stringify(this.cache || {})); },
+  get(id) { return this._load()[id] ?? 0; },
+  set(id, n) { this._load()[id] = n; this._save(); return n; },
+  inc(id) { return this.set(id, this.get(id) + 1); }
 };
 
-// ====== 3) GROUP POSTS BY MONTH ======
-function groupByMonth(list){
-  const sorted = [...list].sort((a,b)=> b.date.localeCompare(a.date));
-  const map = new Map();
-  for(const p of sorted){
+/* ===== 3) GROUP POSTS BY MONTH ===== */
+function groupByMonth(list) {
+  const sorted = [...list].sort((a, b) => b.date.localeCompare(a.date));
+  return sorted.reduce((map, p) => {
     const key = monthKey(p.date);
-    if(!map.has(key)) map.set(key, []);
+    if (!map.has(key)) map.set(key, []);
     map.get(key).push(p);
-  }
-  return map; // Map(monthKey => posts[])
+    return map;
+  }, new Map());
 }
 
-// ====== 4) RENDER ARCHIVE (SIDEBAR) ======
-function renderArchive(groups){
-  const arch = $('#archive');
-  arch.innerHTML = '';
-  for(const [key, items] of groups){
-    const label = monthLabel(key);
-    const details = document.createElement('details');
-    details.className = 'month';
-    // auto-open the most recent month
-    if(arch.children.length === 0) details.open = true;
+/* ===== 4) RENDER ARCHIVE (SIDEBAR) ===== */
+function renderArchive(groups) {
+  const arch = $("#archive");
+  if (!arch) return;
+  arch.innerHTML = "";
 
-    const summary = document.createElement('summary');
-    summary.textContent = `${label} · ${items.length}`;
+  let first = true;
+  for (const [key, items] of groups) {
+    const details = document.createElement("details");
+    details.className = "month";
+    details.open = first; first = false;
 
-    const ul = document.createElement('ul');
+    const summary = document.createElement("summary");
+    summary.textContent = `${monthLabel(key)} · ${items.length}`;
+
+    const ul = document.createElement("ul");
     items.forEach(p => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
+      const li = document.createElement("li");
+      const a = document.createElement("a");
       a.textContent = p.title;
-      a.href = '#'+key; // clicking filters main list to this month
-      li.appendChild(a); ul.appendChild(li);
+      a.href = `#${key}`; // clicking filters main list to this month
+      li.appendChild(a);
+      ul.appendChild(li);
     });
 
-    details.appendChild(summary);
-    details.appendChild(ul);
+    details.append(summary, ul);
     arch.appendChild(details);
   }
 }
 
-// ====== 5) RENDER POSTS (MAIN) ======
-function postCard(p){
-  const wrap = document.createElement('article');
-  wrap.className = 'card';
-  wrap.dataset.id = p.id;
-  const pub = new Date(p.date+"T12:00:00").toLocaleDateString(undefined,{year:'numeric', month:'short', day:'numeric'});
+/* ===== 5) CARDS + MAIN RENDER ===== */
+function postCard(p) {
+  const pub = safeDate(p.date).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
   const views = viewStore.get(p.id);
-  wrap.innerHTML = `
+
+  const card = document.createElement("article");
+  card.className = "card post-card";
+  card.dataset.id = p.id;
+
+  card.innerHTML = `
     <a class="thumb-link" href="${p.url}" target="_blank" rel="noopener">
       <img class="thumb" src="${p.cover}" alt="${p.title}">
     </a>
@@ -123,79 +140,94 @@ function postCard(p){
         </span>
       </div>
       <div class="excerpt">${p.excerpt}</div>
-      <div class="tags">${(p.tags||[]).map(t=>`<span class="tag">#${t}</span>`).join('')}</div>
-    </div>`;
+      <div class="tags">${(p.tags || []).map(t => `<span class="tag">#${t}</span>`).join("")}</div>
+    </div>
+  `;
 
-  // Increment views when users click through
-  wrap.querySelectorAll('a').forEach(a => {
-    a.addEventListener('click', () => {
-      const v = viewStore.increment(p.id);
-      const el = wrap.querySelector('.views');
-      if(el) el.textContent = v;
+  // increment views on any click-through
+  card.querySelectorAll("a").forEach(a => {
+    a.addEventListener("click", () => {
+      const v = viewStore.inc(p.id);
+      const el = card.querySelector(".views");
+      if (el) el.textContent = v;
     });
   });
 
-  return wrap;
+  return card;
 }
 
-function renderPosts(groups, monthFilter=null, term=null){
-  const mount = $('#posts');
-  const active = $('#activeFilters');
-  mount.innerHTML = ''; active.innerHTML = '';
+function renderPosts(groups, monthFilter = null, term = null) {
+  const mount  = $("#posts");
+  const active = $("#activeFilters");
+  if (!mount || !active) return;
 
-  let entries = [];
-  if(monthFilter && groups.has(monthFilter)){
-    entries = groups.get(monthFilter);
-    const pill = document.createElement('div');
-    pill.className = 'pill';
+  mount.innerHTML = "";
+  active.innerHTML = "";
+
+  // base list
+  let list = monthFilter && groups.has(monthFilter)
+    ? [...groups.get(monthFilter)]
+    : Array.from(groups.values()).flat();
+
+  // month pill
+  if (monthFilter && groups.has(monthFilter)) {
+    const pill = document.createElement("div");
+    pill.className = "pill";
     pill.innerHTML = `Month: <strong>${monthLabel(monthFilter)}</strong>`;
     active.appendChild(pill);
-  } else {
-    // flatten all
-    for(const [,items] of groups) entries.push(...items);
   }
 
-  if(term){
+  // search filter
+  if (term && term.trim()) {
     const q = term.trim().toLowerCase();
-    entries = entries.filter(p =>
-      p.title.toLowerCase().includes(q)
-      || (p.excerpt||'').toLowerCase().includes(q)
-      || (p.tags||[]).some(t=>t.toLowerCase().includes(q))
-      || monthLabel(monthKey(p.date)).toLowerCase().includes(q)
+    list = list.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      (p.excerpt || "").toLowerCase().includes(q) ||
+      (p.tags || []).some(t => t.toLowerCase().includes(q)) ||
+      monthLabel(monthKey(p.date)).toLowerCase().includes(q)
     );
-    const pill = document.createElement('div');
-    pill.className = 'pill';
+    const pill = document.createElement("div");
+    pill.className = "pill";
     pill.textContent = `Search: ${term}`;
     active.appendChild(pill);
   }
 
-  // group again by month for section labels
-  const byMonth = groupByMonth(entries);
-  for(const [key, items] of byMonth){
-    const label = document.createElement('div');
-    label.className = 'month-label';
+  // group again for month labels in output
+  const frag = document.createDocumentFragment();
+  const byMonth = groupByMonth(list);
+
+  for (const [key, items] of byMonth) {
+    const label = document.createElement("div");
+    label.className = "month-label";
     label.textContent = monthLabel(key);
-    mount.appendChild(label);
-    items.forEach(p => mount.appendChild(postCard(p)));
+    frag.appendChild(label);
+    items.forEach(p => frag.appendChild(postCard(p)));
   }
 
-  if(entries.length === 0){
+  if (!list.length) {
     mount.innerHTML = '<div style="color:var(--muted); padding:12px 0">No posts match that yet.</div>';
+  } else {
+    mount.appendChild(frag);
   }
 }
 
-// ====== 6) CONTROLLERS (hash + search) ======
+/* ===== 6) CONTROLLERS (hash + search) ===== */
 const groups = groupByMonth(posts);
 renderArchive(groups);
 
-function route(){
-  const hash = location.hash.replace('#','');
-  const term = $('#search').value || null;
-  renderPosts(groups, hash||null, term);
+function route() {
+  const hash = location.hash.replace("#", "") || null;
+  const term = ($("#search") && $("#search").value) || null;
+  renderPosts(groups, hash, term);
 }
-window.addEventListener('hashchange', route);
-$('#search').addEventListener('input', () => route());
+
+window.addEventListener("hashchange", route);
+const searchInput = $("#search");
+if (searchInput) searchInput.addEventListener("input", debounce(route, 150));
+
+// initial render
 route();
 
-// Footer year
-$('#year').textContent = new Date().getFullYear();
+// footer year
+const y = $("#year");
+if (y) y.textContent = new Date().getFullYear();

@@ -1,133 +1,88 @@
+/* ==========================================================
+   ESENCY GLOBAL STYLESHEET (styles.css)
+   ========================================================== */
+
 :root {
-    --black: #000;
-    --near-black: #050505;
-    --bg-1: #111;
-    --text: #fff;
-    --text-dim: #ccc;
-    --text-muted: #888;
-    --brand: #ffcc00;
-    --accent: #ff0033;
-    --line: #444;
-    --line-soft: #eee;
+  --black: #000;
+  --near-black: #050505;
+  --bg-1: #111;
+  --text: #fff;
+  --text-dim: #ccc;
+  --text-muted: #888;
+  --brand: #ffcc00;
+  --accent: #ff0033;
+  --line: #444;
+  --line-soft: #eee;
 }
-/* Base */
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-html, body{
-    min-height: 100%;
-}
+
+/* ===== BASE ===== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { min-height: 100%; }
 body {
-    font-family: 'Helvetica Neue', sans-serif;
-    background: var(--black);
-    color: var(--text);
-    line-height: 1.6;
+  font-family: 'Helvetica Neue', sans-serif;
+  background: var(--black);
+  color: var(--text);
+  line-height: 1.6;
 }
 a {
-    text-decoration: none;
-    color: var(--text);
-    transition: color .3s ease;
+  color: var(--text);
+  text-decoration: none;
+  transition: color .3s ease;
 }
-a:hover {
-    color: var(--brand);
-}
-/* Buttons (shared) */
-.btn{
-    padding: 0px 20px;
-    margin-left: 10px;
-    height: 32px;
-    text-align: center;
-    align-items: center;
-    border: 0;
-    border-radius: 5px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: background .3s ease, color .3s ease;
+a:hover { color: var(--brand); }
+
+/* ===== BUTTONS ===== */
+.btn {
+  padding: 0 20px;
+  margin-left: 10px;
+  height: 32px;
+  border: 0;
+  border-radius: 5px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background .3s ease, color .3s ease;
 }
 .btn--brand {
-    background: var(--brand);
-    color: #000;
+  background: var(--brand);
+  color: #000;
 }
 .btn--brand:hover {
-    background: var(--accent);
-    color: var(--text);
+  background: var(--accent);
+  color: var(--text);
 }
-/* Intro */
-.intro-screen {
-    height: 100vh;
-    background: url(../assets/images/Esency-Photos/Esency-smoke-hoodie.JPG) center/cover no-repeat;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 20px;
-}
-.intro-content {
-    max-width: 600px;
-}
-.intro-content h1 {
-    font-size: 48px;
-    letter-spacing: 2px;
-    margin: 0 0 10px;
-}
-.intro-content p {
-    font-size: 20px;
-    color: var(--text-dim);
-    margin: 0 0 30px;
-}
-.home-background{
-    width: 100%;
-    height: 1000px;
-    overflow-x: hidden;
-    background-image: url("../assets/images/Esency-Photos/esency-young-vibes.JPG");
-}
-.music-background{
-    width: 100%;
-    height: 1000px;
-    overflow-x: hidden;
-    background-image: url("../assets/images/Esency-Photos/esency-flags-2.png");
-    background-size: cover;
-}
-/* Header & Nav */
-header {
-    text-align: center;
-    background: var(--near-black);
-}
+
+/* ===== HEADER / NAV ===== */
+header { text-align: center; background: var(--near-black); }
 header h1 {
-    font-size: 48px;
-    letter-spacing: 2px;
-    margin: 0;
-}
-nav a {
-    font-weight: bold;
-    font-size: 16px;
-    color: var(--text);
-    padding: 8px 16px;
-    border-radius: 6px;
-    text-decoration: none;
-}
-nav a:hover {
-    color: var(--brand);
-}
-nav a.active {
-    color: var(--accent);
-    pointer-events: none;
+  font-size: 48px;
+  letter-spacing: 2px;
+  margin: 0;
 }
 .nav-header {
   display: flex;
   align-items: center;
-  justify-content: center; /* Center contents horizontally */
+  justify-content: center;
   position: relative;
   padding: 20px;
   background-color: transparent;
 }
 nav {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+nav a {
+  font-weight: bold;
+  font-size: 16px;
+  color: var(--text);
+  padding: 8px 16px;
+  border-radius: 6px;
+}
+nav a:hover { color: var(--brand); }
+nav a.active {
+  color: var(--accent);
+  pointer-events: none;
 }
 .esency-logo {
   position: absolute;
@@ -135,266 +90,192 @@ nav {
   font-size: 24px;
   color: var(--text);
 }
-.nav-bar {
-    display: flex;
-    gap: 20px;
+.nav-bar { display: flex; gap: 20px; }
+
+/* ===== HOME & MUSIC BACKGROUNDS ===== */
+.home-background {
+  width: 100%; height: 1000px; overflow-x: hidden;
+  background-image: url("../assets/images/Esency-Photos/esency-young-vibes.JPG");
+  background-size: cover;
 }
-.nav-bar-music a{
-    display: flex;
-    gap: 20px;
-    color: var(--black);
+.music-background {
+  width: 100%; height: 1000px; overflow-x: hidden;
+  background-image: url("../assets/images/Esency-Photos/esency-flags-2.png");
+  background-size: cover;
 }
 
-/* Song covers */
-.song-cover-title {
-    text-align: center;
-    margin: 20px auto;
+/* ===== INTRO / HERO ===== */
+.intro-screen {
+  height: 100vh;
+  background: url(../assets/images/Esency-Photos/Esency-smoke-hoodie.JPG) center/cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
 }
-.song-cover-title h1 {
-    font-size: 28px;
-    margin-top: 70px;
+.intro-content { max-width: 600px; }
+.intro-content h1 {
+  font-size: 48px;
+  letter-spacing: 2px;
+  margin: 0 0 10px;
 }
+.intro-content p {
+  font-size: 20px;
+  color: var(--text-dim);
+  margin: 0 0 30px;
+}
+
+/* ===== SONG COVERS ===== */
+.song-cover-title { text-align: center; margin: 20px auto; }
+.song-cover-title h1 { font-size: 28px; margin-top: 70px; }
 .songs-cover-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    width: 543px;
-    padding: 20px 10px;
-    margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 543px;
+  padding: 20px 10px;
+  margin: 0 auto;
 }
 .song-cover {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border-radius: 5px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 5px;
 }
 .song-cover img {
-    display: block;
-    width: 100%;
-    height: auto;
-    transition: opacity .3s ease;
+  width: 100%;
+  height: auto;
+  transition: opacity .3s ease;
 }
-.song-cover:hover img {
-    opacity: .3;
-}
+.song-cover:hover img { opacity: .3; }
 .cover-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    background: var(--black);
-    color: var(--brand);
-    font-weight: bold;
-    opacity: 0;
-    transition: opacity .3s ease;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--black);
+  color: var(--brand);
+  font-weight: bold;
+  opacity: 0;
+  transition: opacity .3s ease;
 }
-.song-cover:hover .cover-overlay {
-    opacity: 1;
-}
-/* Featured video */
+.song-cover:hover .cover-overlay { opacity: 1; }
+
+/* ===== FEATURED VIDEO ===== */
 .featured-video {
-    padding: 20px;
-    text-align: center;
+  padding: 20px;
+  text-align: center;
 }
-.featured-video h2 {
-    font-size: 24px;
-    margin: 0 0 20px;
-}
+.featured-video h2 { font-size: 24px; margin-bottom: 20px; }
 .featured-video p {
-    font-size: 18px;
-    color: var(--text-dim);
-    margin: 0 0 20px;
+  font-size: 18px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
 }
 .featured-video iframe {
-    display: block;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 560px;
-    height: 315px;
-    border-radius: 5px;
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 560px;
+  height: 315px;
+  border-radius: 5px;
 }
-/* Email signup */
+
+/* ===== EMAIL SIGNUP ===== */
 .email-signup {
-    padding: 25px 15px;
-    text-align: center;
-    border: 4px solid var(--brand);
-    border-radius: 10px;
-    margin: 50px auto;
-    background-color: var(--bg-1);
-    width: 32%;
+  padding: 25px 15px;
+  text-align: center;
+  border: 4px solid var(--brand);
+  border-radius: 10px;
+  margin: 50px auto;
+  background-color: var(--bg-1);
+  width: 32%;
 }
-.email-signup h2 {
-    margin: 0 0 10px;
-}
+.email-signup h2 { margin-bottom: 10px; }
 .email-signup input {
-    padding: 10px;
-    width: 250px;
-    max-width: 80%;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: 1px solid var(--line);
-    background: var(--bg-1);
-    color: var(--text);
+  padding: 10px;
+  width: 250px;
+  max-width: 80%;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--bg-1);
+  color: var(--text);
 }
-.email-signup input::placeholder {
-    color: var(--text-muted);
-}
-.email-signup button {
-    color-scheme: var(--brand);
-}
-/* Footer */
-footer {
-    margin-top: 40px;
-    text-align: center;
-    font-size: 14px;
-    color: var(--brand);
-}
-/* Contact header */
+.email-signup input::placeholder { color: var(--text-muted); }
+
+/* ===== CONTACT PAGE ===== */
 .form-header {
-    text-align: center;
-    font-family: sans-serif;
-    margin: 0px 10px;
+  text-align: center;
+  margin: 0 10px;
 }
 .form-header h2 {
-    color: var(--brand);
-    font-size: 28px;
-    margin: 0 0 10px;
+  color: var(--brand);
+  font-size: 28px;
+  margin-bottom: 10px;
 }
 .form-header p {
-    color: var(--text-dim);
-    font-size: 14px;
-    max-width: 900px;
-    margin: 0 auto;
+  color: var(--text-dim);
+  font-size: 14px;
+  max-width: 900px;
+  margin: 0 auto;
 }
 .contact-background {
-    width: 100%;
-    height: 1000px;
-    overflow-x: hidden;
-    background-image: url("../assets/images/Esency-Photos/Smoky Street Nights_095.JPG");
-    background-size: cover;
+  width: 100%;
+  height: 1000px;
+  overflow-x: hidden;
+  background-image: url("../assets/images/Esency-Photos/Smoky Street Nights_095.JPG");
+  background-size: cover;
 }
 .contact-form form {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    align-items: left;
-    margin: 40px auto;
-    max-width: 650px;
-    padding: 50px 75px;
-    background: rgba(42, 42, 42, 0.8);
-    border-radius: 5px;
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-    border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: left;
+  margin: 40px auto;
+  max-width: 650px;
+  padding: 50px 75px;
+  background: rgba(42, 42, 42, 0.8);
+  border-radius: 5px;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
-.contact-form form label {
-    color: var(--brand);
-
+.contact-form label { color: var(--brand); }
+.contact-form input, .contact-form select {
+  border-radius: 5px;
+  border: none;
+  height: 25px;
+  font-size: 16px;
 }
-.contact-form form input,
-.contact-form form select {
-    border-radius: 5px;
-    border: none;
-    height: 25px;
-    font-size:16px;
+.contact-form textarea {
+  border-radius: 4px;
+  border: none;
 }
-.contact-form form textarea {
-    border-radius: 4px;
-    border: none;
-}
-
-.contact-submit-btn{
-    display: block;
-    justify-content: center;
-    text-align: center;
-    cursor: pointer;
-    font-size: 12px;
-    height: 25px;
-    width: 25%;
-    margin-top: 20px;
-    border: 0;
-    border-radius: 5px;
-    background-color: #ffcc00;
-}
-/* Merch showcase */
-.merch-section-header h1 {
-    text-align: center;
-    font-size: 48px;
-    color: var(--brand);
-    margin: 20px auto;
-}
-.merch-gallery {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 40px;
-    padding: 60px 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-    justify-items: center;
-}
-.merch-item {
-    text-align: center;
-}
-.merch-item img {
-    width: 300px;
-    height: auto;
-    object-fit: contain;
-    transition: transform .3s ease, opacity .3s ease;
-}
-.merch-item img:hover {
-    transform: scale(1.05);
-    opacity: .9;
-    cursor: pointer;
-}
-.product-name {
-    font-size: 18px;
-    margin-top: 10px;
-    font-weight: bold;
-}
-.product-price {
-    font-size: 16px;
-    color: var(--brand);
-    margin-top: 4px;
-}
-/* Reusable page section */
-.page-section {
-    padding: 80px 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    text-align: center;
-}
-.page-section h2 {
-    font-size: 28px;
-    color: var(--brand);
-    margin: 0 0 16px;
-}
-.page-section p {
-    font-size: 18px;
-    color: var(--text-dim);
-}
-#message{
-    font-size: 16px;
+.contact-submit-btn {
+  cursor: pointer;
+  font-size: 12px;
+  height: 25px;
+  width: 25%;
+  margin-top: 20px;
+  border-radius: 5px;
+  background-color: var(--brand);
 }
 
-.cart-link {
-  font-weight: bold;
-  padding: 8px 16px;
-  border-radius: 6px;
-  background-color: #222;
+/* ===== FOOTER ===== */
+footer {
+  margin-top: 40px;
+  text-align: center;
+  font-size: 14px;
   color: var(--brand);
-  transition: background 0.3s ease;
 }
 
-.cart-link:hover {
-  background-color: var(--accent);
-  color: white;
-}
-/* Share bar */
+/* ===== SHARE BAR (global) ===== */
 .share {
   display: flex;
   flex-wrap: wrap;
@@ -402,26 +283,21 @@ footer {
   align-items: center;
   margin-top: 10px;
 }
-.share a,
-.share button {
+.share a, .share button {
   background: #111;
   color: #fff;
   border: none;
   border-radius: 8px;
   padding: 6px 10px;
-  font: inherit;
-  text-decoration: none;
   cursor: pointer;
 }
-.share a:hover,
-.share button:hover {
-  background: var(--brand, #ffcf33);
+.share a:hover, .share button:hover {
+  background: var(--brand);
   color: #000;
 }
 .copy-toast {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 24px; bottom: 24px;
   background: #111;
   color: #fff;
   padding: 10px 12px;
@@ -433,9 +309,7 @@ footer {
 }
 .copy-toast.show { opacity: 1; transform: translateY(0); }
 
-/* Responsive */
+/* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-    .contact-wrapper {
-        flex-direction: column;
-    }
+  .contact-wrapper { flex-direction: column; }
 }

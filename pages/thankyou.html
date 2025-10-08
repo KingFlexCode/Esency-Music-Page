@@ -1,30 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Thank you — Esency</title>
-  <link rel="stylesheet" href="../styles/styles.css"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thank You — Esency</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
   <style>
-    .wrap{max-width:720px;margin:60px auto;padding:0 16px;text-align:center}
-    .card{background:#111;border-radius:12px;padding:24px}
-    h1{margin-bottom:8px}
-    .muted{opacity:.8}
-    .btn{margin-top:20px;display:inline-block;padding:10px 14px;border-radius:8px;background:#fff;color:#000;font-weight:700;text-decoration:none}
+    body {
+      background: var(--black);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 720px;
+      margin: 60px auto;
+      padding: 0 16px;
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .card {
+      background: var(--near-black);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 40px 24px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+    }
+
+    h1 {
+      font-size: 32px;
+      color: var(--brand);
+      margin-bottom: 8px;
+    }
+
+    .muted {
+      color: var(--text-dim);
+      font-size: 16px;
+    }
+
+    #oid {
+      margin-top: 16px;
+      font-family: ui-monospace, monospace;
+      background: #000;
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: var(--brand);
+      letter-spacing: 0.3px;
+    }
+
+    .btn {
+      margin-top: 28px;
+      display: inline-block;
+      padding: 12px 18px;
+      border-radius: 8px;
+      background: var(--brand);
+      color: #000;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn:hover {
+      background: var(--accent);
+      color: var(--text);
+      transform: translateY(-2px);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
+
 <body>
   <main class="wrap">
     <div class="card">
       <h1>Thank you for your order!</h1>
       <p class="muted">We’re getting it made. You’ll receive email updates with tracking.</p>
-      <p id="oid" style="margin-top:12px;font-family:ui-monospace,monospace;"></p>
-      <a class="btn" href="./merch.html">Continue shopping</a>
+      <p id="oid"></p>
+      <a class="btn" href="./merch.html">Continue Shopping</a>
     </div>
   </main>
-  <script>
-    const id = sessionStorage.getItem('lastOrderId');
-    if (id) document.getElementById('oid').textContent = 'Order ID: ' + id;
+
+  <script type="module">
+    import { clearCart } from "../scripts/cart-utils.js";
+
+    // Clear any local cart just in case and show order ID if available
+    clearCart();
+    const id = sessionStorage.getItem("lastOrderId");
+    if (id) document.getElementById("oid").textContent = "Order ID: " + id;
   </script>
 </body>
 </html>

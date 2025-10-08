@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Processing Order — Esency</title>
+  <link rel="stylesheet" href="../styles/styles.css" />
+  <style>
+    body {
+      background: var(--black);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Helvetica Neue', sans-serif;
+      overflow: hidden;
+    }
+
+    .wrap {
+      text-align: center;
+      animation: fadeIn 0.8s ease forwards;
+    }
+
+    .loader {
+      width: 64px;
+      height: 64px;
+      border: 5px solid #333;
+      border-top-color: var(--brand);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 24px;
+    }
+
+    h1 {
+      font-size: 26px;
+      color: var(--brand);
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--text-dim);
+      font-size: 16px;
+    }
+
+    .msg {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="wrap">
+    <div class="loader"></div>
+    <h1>Processing your order…</h1>
+    <p>Please wait while we confirm your payment and prepare your shipment.</p>
+    <p id="status-msg" class="msg"></p>
+  </main>
+
+  <script type="module">
+    const params = new URLSearchParams(location.search);
+    const next = params.get("next") || "./thankyou.html";
+    const fail = params.get("fail") || "./order-failed.html";
+    const orderId = sessionStorage.getItem("lastOrderId");
+    const err = sessionStorage.getItem("lastOrderError");
+    const statusMsg = document.getElementById("status-msg");
+
+    // If there was an immediate failure
+    if (err) {
+      statusMsg.textContent = "Error detected. Redirecting to order-failed page...";
+      setTimeout(() => {
+        window.location.href = fail;
+      }, 1500);
+    }
+
+    // If we already have a successful order ID, go straight to thank you
+    else if (orderId) {
+      statusMsg.textContent = `Order ID: ${orderId}`;
+      setTimeout(() => {
+        window.location.href = next;
+      }, 2500);
+    }
+
+    // Otherwise, show a live polling message and redirect after timeout
+    else {
+      let dots = "";
+      const interval = setInterval(() => {
+        dots = dots.length < 3 ? dots + "." : "";
+        statusMsg.textContent = "Still finalizing" + dots;
+      }, 500);
+
+      // After 8 seconds, fallback to fail page (safety timeout)
+      setTimeout(() => {
+        clearInterval(interval);
+        sessionStorage.setItem("lastOrderError", "No confirmation received in time.");
+        window.location.href = fail;
+      }, 8000);
+    }
+  </script>
+</body>
+</html>
