@@ -58,8 +58,6 @@ renderCart();
 // ----------------------------------------------------------
 // MANUAL TEST BUTTON -> CREATE PRINTIFY ORDER DIRECTLY
 // ----------------------------------------------------------
-import { loadCart } from "./cart-utils.js";
-import { mapCartToPrintifyItems, sendPrintifyOrder } from "./printify-api.js";
 
 const testBtn = document.getElementById("printify-test-btn");
 if (testBtn) {
