@@ -1,6 +1,4 @@
 // netlify/functions/create-printify-order.js
-import fetch from "node-fetch";
-
 const CORS = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "Content-Type",
