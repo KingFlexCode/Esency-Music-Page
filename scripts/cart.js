@@ -55,6 +55,44 @@ export function renderCart() {
 // Initial render
 renderCart();
 
+// ----------------------------------------------------------
+// MANUAL TEST BUTTON -> CREATE PRINTIFY ORDER DIRECTLY
+// ----------------------------------------------------------
+import { loadCart } from "./cart-utils.js";
+import { mapCartToPrintifyItems, sendPrintifyOrder } from "./printify-api.js";
+
+const testBtn = document.getElementById("printify-test-btn");
+if (testBtn) {
+  testBtn.addEventListener("click", async () => {
+    const cart = loadCart();
+    const items = mapCartToPrintifyItems(cart);
+    if (!items.length) {
+      alert("⚠️ Add at least one product first.");
+      return;
+    }
+
+    const customer = {
+      first_name: "Test",
+      last_name: "Buyer",
+      email: "test@example.com",
+      address1: "123 Main St",
+      city: "Bronx",
+      region: "NY",
+      zip: "10467",
+      country: "US"
+    };
+
+    try {
+      const data = await sendPrintifyOrder({ items, customer, send_to_production: false });
+      console.log("✅ Printify test success:", data);
+      alert("✅ Order test sent successfully! Check Netlify logs for response.");
+    } catch (err) {
+      console.error("❌ Printify test failed:", err);
+      alert("❌ Printify test failed: " + (err.message || "Unknown error"));
+    }
+  });
+}
+
 // ---------------- QTY / REMOVE EVENTS ----------------
 document.body.addEventListener("click", (e) => {
   const minus = e.target.matches(".qty-btn[data-op='-']");
