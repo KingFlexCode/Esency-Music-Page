@@ -1,65 +1,41 @@
-/**
- * update-product-map.js
- * 
- * Fetches product + variant data from your live Netlify function,
- * and automatically regenerates /scripts/product-map.js.
- * 
- * Run manually anytime with:  node scripts/update-product-map.js
- */
-
 import fs from "fs";
 import fetch from "node-fetch";
 
-// 1️⃣ Replace with your own deployed Netlify URL
-const NETLIFY_FUNCTION_URL = "https://esencymusic.netlify.app/functions/fetch-printful-products";
+const API_URL = "https://esencymusic.netlify.app/.netlify/functions/fetch-printful-products";
 
 async function main() {
   console.log("🔄 Fetching product data from Printful via Netlify...");
+  const res = await fetch(API_URL);
+  const data = await res.json();
 
-  const response = await fetch(NETLIFY_FUNCTION_URL);
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error("❌ Fetch failed:", data);
-    process.exit(1);
+  if (!data.result || !Array.isArray(data.result)) {
+    console.error("❌ Invalid data from Printful:", data);
+    return;
   }
 
-  const products = data.products || [];
-  console.log(`✅ Received ${products.length} products`);
+  const productMap = {};
 
-  // 2️⃣ Build mapping object for each product
-  const map = {};
-
-  for (const p of products) {
-    if (!p || !p.variants) continue;
-
-    const variantMap = {};
-    for (const v of p.variants) {
-      if (!v.size || !v.id) continue;
-      variantMap[v.size.toUpperCase()] = v.id;
+  for (const product of data.result) {
+    const variants = {};
+    for (const v of product.variants || []) {
+      const size = v.size?.toUpperCase?.();
+      if (size) variants[size] = v.id;
     }
-
-    const cleanName = p.name.toLowerCase().replace(/\s+/g, "-");
-    map[cleanName] = {
-      product_id: p.id,
-      variants: variantMap,
+    productMap[product.id] = {
+      product_id: product.id,
+      name: product.name,
+      type: product.product_type || "Other",
+      price: product.retail_price || 0,
+      variants,
+      image: product.thumbnail_url || "",
     };
   }
 
-  // 3️⃣ Convert to JS export file
-  const jsOutput =
-    "/* Auto-generated from Printful — Do Not Edit Manually */\n\n" +
-    "export const PRODUCT_MAP = " +
-    JSON.stringify(map, null, 2) +
-    ";\n";
-
-  // 4️⃣ Save file to scripts/product-map.js
-  fs.writeFileSync("./scripts/product-map.js", jsOutput, "utf-8");
-
-  console.log("✅ Updated scripts/product-map.js successfully!");
+  const output = `// AUTO-GENERATED: Printful product map\nexport const PRODUCT_MAP = ${JSON.stringify(productMap, null, 2)};\n`;
+  fs.writeFileSync("scripts/product-map.js", output);
+  console.log("✅ product-map.js updated successfully!");
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error("🔥 Error updating product map:", err);
-  process.exit(1);
 });
