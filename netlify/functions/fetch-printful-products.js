@@ -1,7 +1,8 @@
 // netlify/functions/fetch-printful-products.js
 export async function handler() {
   try {
-    const resp = await fetch("https://api.printful.com/store/products", {
+    // ✅ Fetch all products from Printful (works for all store types)
+    const resp = await fetch("https://api.printful.com/products", {
       headers: {
         Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
         "Content-Type": "application/json",
@@ -17,6 +18,7 @@ export async function handler() {
     }
 
     const data = await resp.json();
+
     return {
       statusCode: 200,
       body: JSON.stringify({
