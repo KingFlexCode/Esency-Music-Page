@@ -1,35 +1,31 @@
 // netlify/functions/fetch-printful-products.js
-import fetch from "node-fetch";
-
 export async function handler() {
   try {
-    const response = await fetch("https://api.printful.com/store/products", {
+    const resp = await fetch("https://api.printful.com/store/products", {
       headers: {
         Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
+        "Content-Type": "application/json",
       },
     });
 
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("❌ Printful API error:", text);
+    if (!resp.ok) {
+      const errorText = await resp.text();
       return {
-        statusCode: response.status,
-        body: JSON.stringify({ error: "Printful API failed", detail: text }),
+        statusCode: resp.status,
+        body: JSON.stringify({ error: "Failed to fetch Printful products", details: errorText }),
       };
     }
 
-    const json = await response.json();
-
+    const data = await resp.json();
     return {
       statusCode: 200,
       body: JSON.stringify({
         updated: new Date().toISOString(),
-        count: json?.result?.length || 0,
-        products: json?.result || [],
+        count: data.result?.length || 0,
+        products: data.result || [],
       }),
     };
   } catch (err) {
-    console.error("❌ Function failed:", err);
     return {
       statusCode: 500,
       body: JSON.stringify({ error: err.message }),
