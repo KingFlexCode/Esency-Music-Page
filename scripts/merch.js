@@ -1,72 +1,145 @@
 /* ==========================================================
-   ESENCY MERCH PAGE — CART HANDLER (Fixed Version)
+   ESENCY MERCH PAGE — Dynamic Product Rendering with
+   Printful Live Prices + Local Caching
    ========================================================== */
 
-// --- Load and initialize cart ---
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+import { PRODUCT_MAP } from "./product-map.js";
+import { addToCart, updateCartCount } from "./cart-utils.js";
 
-// --- Update cart count on load ---
-updateCartCount();
+// --- Constants ---
+const PRICE_CACHE_KEY = "printfulPriceCache";
+const PRICE_CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours
 
-// --- Event delegation for Add to Cart buttons ---
-document.body.addEventListener("click", (e) => {
-  // only respond to buttons inside merch items
-  if (e.target.tagName.toLowerCase() !== "button") return;
+// --- Initialize ---
+document.addEventListener("DOMContentLoaded", async () => {
+  updateCartCount();
 
-  const item = e.target.closest(".merch-item");
-  if (!item) return;
+  const priceMap = await getCachedPrices();
+  renderMerch(priceMap);
 
-  const productId = item.dataset.id;
-  const name = item.querySelector(".product-name").textContent.trim();
-  const price = parseFloat(item.dataset.price);
-  const sizeSelect = item.querySelector("select[name='size']");
-  const size = sizeSelect ? sizeSelect.value : "";
+  // 🛒 Add-to-cart listener
+  document.body.addEventListener("click", (e) => {
+    if (e.target.classList.contains("add-to-cart")) {
+      const item = e.target.closest(".merch-item");
+      const productId = item.dataset.id;
+      const name = item.querySelector(".product-name").textContent.trim();
+      const price = parseFloat(item.dataset.price);
+      const size = item.querySelector("select[name='size']").value;
 
-  if (!size) {
-    alert("Please select a size first.");
-    return;
-  }
+      if (!size) {
+        alert("Please select a size first.");
+        return;
+      }
 
-  addToCart(productId, name, price, size);
-  showToast(`${name} (${size}) added to cart.`);
+      addToCart(productId, name, price, size);
+      showToast(`${name} (${size}) added to cart.`);
+    }
+  });
 });
 
-// --- Functions ---
-function addToCart(productId, name, price, size) {
-  // Load current cart from localStorage again in case it changed in another tab
-  let cart = JSON.parse(localStorage.getItem("cart")) || [];
+/* ----------------------------------------------------------
+   🔄 Fetch or load cached prices
+   ---------------------------------------------------------- */
+async function getCachedPrices() {
+  try {
+    const cached = localStorage.getItem(PRICE_CACHE_KEY);
+    if (cached) {
+      const { timestamp, data } = JSON.parse(cached);
+      const now = Date.now();
+      if (now - timestamp < PRICE_CACHE_DURATION) {
+        console.log("💾 Using cached Printful prices");
+        return data;
+      }
+    }
 
-  // Check if same item + size exists
-  const existing = cart.find(item => item.productId === productId && item.size === size);
-
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ productId, name, price, size, quantity: 1 });
+    console.log("🌐 Fetching live Printful prices...");
+    const res = await fetch("/.netlify/functions/fetch-printful-prices");
+    const result = await res.json();
+    if (result.success) {
+      const data = result.priceMap;
+      localStorage.setItem(
+        PRICE_CACHE_KEY,
+        JSON.stringify({ timestamp: Date.now(), data })
+      );
+      return data;
+    } else {
+      console.warn("⚠️ Failed to fetch live prices:", result.error);
+    }
+  } catch (err) {
+    console.error("❌ Error fetching prices:", err);
   }
-
-  // Save back to localStorage
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  // Update the count in header
-  updateCartCount();
+  return {}; // fallback
 }
 
-function updateCartCount() {
-  const cart = JSON.parse(localStorage.getItem("cart")) || [];
-  const count = cart.reduce((sum, i) => sum + (i.quantity || 0), 0);
-  const el = document.getElementById("cart-count");
-  if (el) el.textContent = count;
+/* ----------------------------------------------------------
+   🧱 Render merch dynamically from PRODUCT_MAP
+   ---------------------------------------------------------- */
+function renderMerch(priceMap = {}) {
+  const merchContainer = document.getElementById("merch-container");
+  merchContainer.innerHTML = "";
+
+  const grouped = {};
+  Object.entries(PRODUCT_MAP).forEach(([key, product]) => {
+    if (!grouped[product.category]) grouped[product.category] = [];
+    grouped[product.category].push({ key, ...product });
+  });
+
+  for (const [category, items] of Object.entries(grouped)) {
+    const section = document.createElement("section");
+    section.className = "merch-gallery";
+    section.innerHTML = `<div class="merch-section-header"><h1>${category}</h1></div>`;
+
+    const gallery = document.createElement("div");
+    gallery.className = "merch-grid";
+
+    items.forEach((p) => {
+      const price = priceMap[p.product_id] || 35.0;
+      const sizes = Object.keys(p.variants)
+        .map((s) => `<option value="${s}">${s}</option>`)
+        .join("");
+
+      const productHTML = `
+        <div class="merch-item" data-id="${p.key}" data-price="${price}">
+          <img src="${p.thumbnail}" alt="${p.key}">
+          <p class="product-name">${formatName(p.key)}</p>
+          <p class="product-price">$${price.toFixed(2)}</p>
+          <div class="size-row">
+            <label>Size:</label>
+            <select name="size">
+              <option value="">Select size</option>
+              ${sizes}
+            </select>
+          </div>
+          <button class="add-to-cart">Add to Cart</button>
+        </div>
+      `;
+      gallery.insertAdjacentHTML("beforeend", productHTML);
+    });
+
+    section.appendChild(gallery);
+    merchContainer.appendChild(section);
+  }
+}
+
+/* ----------------------------------------------------------
+   🧩 Utilities
+   ---------------------------------------------------------- */
+function formatName(key) {
+  return key
+    .replace(/-/g, " ")
+    .replace(/\s+/g, " ")
+    .replace(/\b\w/g, (l) => l.toUpperCase());
 }
 
 function showToast(message = "Added to cart.") {
-  const toast = document.getElementById("toast");
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
   toast.textContent = message;
   toast.classList.add("show");
   setTimeout(() => toast.classList.remove("show"), 2000);
 }
-
-// --- Handle cross-page sync (optional but smart) ---
-window.addEventListener("storage", (e) => {
-  if (e.key === "cart") updateCartCount();
-});
