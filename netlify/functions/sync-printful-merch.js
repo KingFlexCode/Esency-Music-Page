@@ -1,8 +1,12 @@
 // netlify/functions/sync-printful-merch.js
-import fetch from "node-fetch";
-import fs from "fs";
+// ========================================================
+// SYNC PRINTFUL MERCH (CommonJS for Netlify runtime)
+// ========================================================
 
-export async function handler() {
+const fetch = require("node-fetch");
+const fs = require("fs");
+
+exports.handler = async () => {
   try {
     console.log("🚀 Starting Printful merch sync with full variant fetch...");
 
@@ -95,5 +99,4 @@ export const PRODUCT_MAP = ${JSON.stringify(grouped, null, 2)};
       body: JSON.stringify({ success: false, error: err.message }),
     };
   }
-}
-\
+};
