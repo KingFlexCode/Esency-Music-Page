@@ -4,8 +4,26 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Esency Merch</title>
-  <link rel="stylesheet" href="../styles/styles.css">
-  <link rel="stylesheet" href="../styles/styles-merch.css">
+
+  <!-- STYLES -->
+  <link rel="stylesheet" href="../styles/styles.css" />
+  <link rel="stylesheet" href="../styles/styles-merch.css" />
+
+  <style>
+    /* Quick fallback styles if merch.js takes a second to load */
+    #merch-container {
+      text-align: center;
+      padding: 40px 20px;
+      color: #ddd;
+      font-size: 1.1em;
+    }
+    .merch-section-header h1 {
+      text-align: center;
+      color: white;
+      margin-top: 40px;
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 
 <body>
@@ -21,16 +39,20 @@
       <a href="./links.html">Links</a>
       <a href="./bio.html">Bio</a>
       <a href="./contact.html">Contact</a>
-      <a href="./cart.html" id="cart-button" class="cart-link">🛒 Cart (<span id="cart-count">0</span>)</a>
+      <a href="./cart.html" id="cart-button" class="cart-link">
+        🛒 Cart (<span id="cart-count">0</span>)
+      </a>
     </nav>
   </header>
 
   <!-- MAIN -->
   <main id="merch-container">
-    <div class="merch-section-header"><h1>Merch</h1></div>
-    <p style="text-align:center; opacity:0.7;">Loading products...</p>
+    <div class="merch-section-header">
+      <h1>Official Esency Merch</h1>
+    </div>
+    <p id="loading-msg" style="text-align:center; opacity:0.7;">Loading products...</p>
+    <!-- merch.js will replace this area with product grid -->
   </main>
-
 
   <!-- FOOTER -->
   <footer>
@@ -40,6 +62,7 @@
   <!-- TOAST -->
   <div id="toast" class="toast">Added to cart.</div>
 
-  <script src="../scripts/merch.js"></script>
+  <!-- ✅ FIXED: use ES modules -->
+  <script type="module" src="../scripts/merch.js"></script>
 </body>
 </html>
