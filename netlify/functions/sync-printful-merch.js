@@ -1,9 +1,16 @@
 // netlify/functions/sync-printful-merch.js
 // ========================================================
-// SYNC PRINTFUL MERCH (CommonJS for Netlify runtime)
+// SYNC PRINTFUL MERCH — Works in both Netlify & local Node
 // ========================================================
 
-const fetch = require("node-fetch");
+let fetchFn;
+try {
+  // Use global fetch if available (Netlify has it built-in)
+  fetchFn = fetch;
+} catch {
+  // Fallback for local Node execution
+  fetchFn = require("node-fetch");
+}
 const fs = require("fs");
 
 exports.handler = async () => {
@@ -11,7 +18,7 @@ exports.handler = async () => {
     console.log("🚀 Starting Printful merch sync with full variant fetch...");
 
     // 1️⃣ Get all products (summary list)
-    const res = await fetch("https://api.printful.com/store/products", {
+    const res = await fetchFn("https://api.printful.com/store/products", {
       headers: { Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}` },
     });
 
@@ -34,7 +41,7 @@ exports.handler = async () => {
     const fullProducts = [];
     for (const item of data.result) {
       try {
-        const detailRes = await fetch(
+        const detailRes = await fetchFn(
           `https://api.printful.com/store/products/${item.id}`,
           {
             headers: { Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}` },
