@@ -147,10 +147,15 @@ nav a.active {
 
 .song-cover {
   position: relative;
-  display: inline-block;
   overflow: hidden;
   border-radius: 5px;
   cursor: pointer;
+}
+
+/* 🧠 Force hover to stay active inside the entire link */
+.song-cover a {
+  display: block;
+  position: relative;
 }
 
 .song-cover img {
@@ -158,25 +163,26 @@ nav a.active {
   display: block;
   transition: opacity 0.4s ease;
   border-radius: 5px;
+  pointer-events: none; /* prevents losing hover */
 }
 
-/* Overlay layer */
+/* Overlay layer (darkness + text container) */
 .cover-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.7); /* darken effect */
+  background: rgba(0, 0, 0, 0.7);
   opacity: 0;
   transition: opacity 0.4s ease;
-  pointer-events: none; /* prevents flicker */
   border-radius: 5px;
+  pointer-events: none; /* key fix: stops hover flicker */
 }
 
-/* Song title inside overlay */
+/* Song title */
 .cover-overlay p {
-  color: var(--brand); /* yellow band text */
+  color: var(--brand);
   font-weight: bold;
   font-size: 1.1rem;
   opacity: 0;
@@ -186,7 +192,7 @@ nav a.active {
   letter-spacing: 1px;
 }
 
-/* Hover effect */
+/* Hover effect (smooth and stable) */
 .song-cover:hover img {
   opacity: 0.3;
 }
