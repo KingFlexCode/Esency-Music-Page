@@ -127,8 +127,15 @@ nav a.active {
 }
 
 /* ===== SONG COVERS ===== */
-.song-cover-title { text-align: center; margin: 20px auto; }
-.song-cover-title h1 { font-size: 28px; margin-top: 70px; }
+.song-cover-title {
+  text-align: center;
+  margin: 20px auto;
+}
+.song-cover-title h1 {
+  font-size: 28px;
+  margin-top: 70px;
+}
+
 .songs-cover-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -137,34 +144,59 @@ nav a.active {
   padding: 20px 10px;
   margin: 0 auto;
 }
+
 .song-cover {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: inline-block;
   overflow: hidden;
   border-radius: 5px;
+  cursor: pointer;
 }
+
 .song-cover img {
   width: 100%;
-  height: auto;
-  transition: opacity .3s ease;
+  display: block;
+  transition: opacity 0.4s ease;
+  border-radius: 5px;
 }
-.song-cover:hover img { opacity: .3; }
+
+/* Overlay layer */
 .cover-overlay {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  background: var(--black);
-  color: var(--brand);
-  font-weight: bold;
+  background: rgba(0, 0, 0, 0.7); /* darken effect */
   opacity: 0;
-  transition: opacity .3s ease;
+  transition: opacity 0.4s ease;
+  pointer-events: none; /* prevents flicker */
+  border-radius: 5px;
 }
-.song-cover:hover .cover-overlay { opacity: 1; }
+
+/* Song title inside overlay */
+.cover-overlay p {
+  color: var(--brand); /* yellow band text */
+  font-weight: bold;
+  font-size: 1.1rem;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.4s ease;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+/* Hover effect */
+.song-cover:hover img {
+  opacity: 0.3;
+}
+.song-cover:hover .cover-overlay {
+  opacity: 1;
+}
+.song-cover:hover .cover-overlay p {
+  opacity: 1;
+  transform: translateY(0);
+}
 
 /* ===== FEATURED VIDEO ===== */
 .featured-video {
@@ -311,5 +343,16 @@ footer {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 900px) {
-  .contact-wrapper { flex-direction: column; }
+  .songs-cover-grid {
+    grid-template-columns: repeat(2, 1fr);
+    width: 90%;
+  }
+  .email-signup { width: 80%; }
+}
+
+@media (max-width: 600px) {
+  .songs-cover-grid {
+    grid-template-columns: 1fr;
+    width: 90%;
+  }
 }
