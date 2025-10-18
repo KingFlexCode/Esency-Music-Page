@@ -145,28 +145,30 @@ nav a.active {
   margin: 0 auto;
 }
 
+/* Song cover container */
 .song-cover {
   position: relative;
   overflow: hidden;
   border-radius: 5px;
   cursor: pointer;
+  -webkit-transform: translateZ(0); /* Safari hover stability */
+  will-change: opacity, transform;
 }
 
-/* 🧠 Force hover to stay active inside the entire link */
 .song-cover a {
   display: block;
   position: relative;
+  z-index: 1;
 }
 
 .song-cover img {
   width: 100%;
   display: block;
-  transition: opacity 0.4s ease;
   border-radius: 5px;
-  pointer-events: none; /* prevents losing hover */
+  transition: opacity 0.4s ease;
 }
 
-/* Overlay layer (darkness + text container) */
+/* Overlay (dark layer + title) */
 .cover-overlay {
   position: absolute;
   inset: 0;
@@ -174,13 +176,13 @@ nav a.active {
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.7);
+  border-radius: 5px;
   opacity: 0;
   transition: opacity 0.4s ease;
-  border-radius: 5px;
-  pointer-events: none; /* key fix: stops hover flicker */
+  z-index: 2;
+  -webkit-transform: translateZ(0); /* Safari fix */
 }
 
-/* Song title */
 .cover-overlay p {
   color: var(--brand);
   font-weight: bold;
@@ -192,20 +194,7 @@ nav a.active {
   letter-spacing: 1px;
 }
 
-/* --- Safari hover flicker fix --- */
-@supports (-webkit-touch-callout: none) {
-  .cover-overlay {
-    pointer-events: auto; /* re-enable for Safari only */
-  }
-  .song-cover a {
-    pointer-events: none; /* make only the container detect hover */
-  }
-  .song-cover:hover .cover-overlay {
-    pointer-events: none;
-  }
-}
-
-/* Hover effect (smooth and stable) */
+/* Hover effect */
 .song-cover:hover img {
   opacity: 0.3;
 }
