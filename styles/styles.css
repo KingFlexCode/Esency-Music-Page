@@ -192,6 +192,19 @@ nav a.active {
   letter-spacing: 1px;
 }
 
+/* --- Safari hover flicker fix --- */
+@supports (-webkit-touch-callout: none) {
+  .cover-overlay {
+    pointer-events: auto; /* re-enable for Safari only */
+  }
+  .song-cover a {
+    pointer-events: none; /* make only the container detect hover */
+  }
+  .song-cover:hover .cover-overlay {
+    pointer-events: none;
+  }
+}
+
 /* Hover effect (smooth and stable) */
 .song-cover:hover img {
   opacity: 0.3;
