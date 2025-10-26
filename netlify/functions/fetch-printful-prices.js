@@ -21,15 +21,14 @@ export async function handler() {
 
     // 🧾 Build a price map of { product_id: retail_price }
     const priceMap = {};
-    data.result.forEach((product) => {
-      const productId = product.id;
-      const retailPrice = parseFloat(
-        product.sync_variants?.[0]?.retail_price || "0"
-      );
-      if (productId && retailPrice > 0) {
-        priceMap[productId] = retailPrice;
-      }
-    });
+      data.result.forEach((product) => {
+    const productId = product.id;
+    const price = parseFloat(product.price || "0");
+    if (productId && price > 0) {
+      priceMap[productId] = price;
+    }
+  });
+
 
     return {
       statusCode: 200,
