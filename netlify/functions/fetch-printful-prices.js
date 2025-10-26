@@ -1,35 +1,51 @@
-// netlify/functions/fetch-printful-prices.js
+// /netlify/functions/fetch-printful-prices.js
+
 import fetch from "node-fetch";
 
 export async function handler() {
   try {
-    const res = await fetch("https://api.printful.com/store/products", {
+    // 🔑 Replace with your actual Printful API key
+    const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+
+    const response = await fetch("https://api.printful.com/store/products", {
       headers: {
-        Authorization: `Bearer ${process.env.PRINTFUL_API_KEY}`,
-        "Content-Type": "application/json",
+        Authorization: `Bearer ${PRINTFUL_API_KEY}`,
       },
     });
 
-    const data = await res.json();
-    if (!res.ok) throw new Error(data?.error?.message || "Printful API error");
+    const data = await response.json();
 
-    // Build a simple {product_id: price} map
-    const priceMap = {};
-    for (const p of data.result || []) {
-      const firstVariant = p.variants && p.variants[0];
-      if (firstVariant && firstVariant.retail_price) {
-        priceMap[p.id] = parseFloat(firstVariant.retail_price);
-      }
+    if (!data.result || !Array.isArray(data.result)) {
+      throw new Error("Unexpected Printful response format");
     }
+
+    // 🧾 Build a price map of { product_id: retail_price }
+    const priceMap = {};
+    data.result.forEach((product) => {
+      const productId = product.id;
+      const retailPrice = parseFloat(
+        product.sync_variants?.[0]?.retail_price || "0"
+      );
+      if (productId && retailPrice > 0) {
+        priceMap[productId] = retailPrice;
+      }
+    });
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, priceMap }),
+      body: JSON.stringify({
+        success: true,
+        priceMap,
+      }),
     };
-  } catch (err) {
+  } catch (error) {
+    console.error("Printful Fetch Error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, error: err.message }),
+      body: JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
     };
   }
 }
