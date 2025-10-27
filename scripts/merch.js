@@ -52,17 +52,18 @@ async function getCachedPrices() {
       }
     }
 
-    console.log("🌐 Fetching live Printful prices...");
     const res = await fetch("/.netlify/functions/fetch-printful-prices");
     const result = await res.json();
-    if (result.success) {
-      const data = result.priceMap;
-      localStorage.setItem(
-        PRICE_CACHE_KEY,
-        JSON.stringify({ timestamp: Date.now(), data })
-      );
-      return data;
-    } else {
+
+  if (result.success) {
+    const data = result.priceMap;
+    localStorage.setItem(
+      
+      PRICE_CACHE_KEY,
+      JSON.stringify({ timestamp: Date.now(), data })
+    );
+    return data;
+  }else {
       console.warn("⚠️ Failed to fetch live prices:", result.error);
     }
   } catch (err) {
