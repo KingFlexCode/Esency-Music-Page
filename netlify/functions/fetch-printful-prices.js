@@ -6,15 +6,18 @@ export async function handler() {
   try {
     // Step 1: Fetch list of products
     const res = await fetch("https://api.printful.com/store/products", {
-      headers: {
-        Authorization: `Bearer ${PRINTFUL_API_KEY}`,
-      },
-    });
+  headers: {
+    Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+  },
+});
 
-    const data = await res.json();
-    if (!Array.isArray(data.result)) {
-      throw new Error("Unexpected Printful response format (products)");
-    }
+const data = await res.json();
+console.log("🔥 Raw response from Printful:", JSON.stringify(data, null, 2));
+
+if (!Array.isArray(data.result)) {
+  throw new Error("Unexpected Printful response format (products)");
+}
+
 
     const priceMap = {};
 
