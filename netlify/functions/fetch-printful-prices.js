@@ -1,51 +1,56 @@
-// /netlify/functions/fetch-printful-prices.js
-
 import fetch from "node-fetch";
 
 export async function handler() {
   try {
-    // 🔑 Replace with your actual Printful API key
     const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+    const url = "https://api.printful.com/store/products";
 
-    const response = await fetch("https://api.printful.com/store/products", {
+    const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${PRINTFUL_API_KEY}`,
       },
     });
 
     const data = await response.json();
-    console.log("🔍 Raw Printful data:", JSON.stringify(data, null, 2));
+    console.log("🔍 Raw Printful response keys:", Object.keys(data));
 
-    if (!data.result || !Array.isArray(data.result)) {
-      throw new Error("Unexpected Printful response format");
+    // ✅ Try to handle all possible shapes of Printful response
+    let products = [];
+    if (Array.isArray(data.result)) {
+      products = data.result;
+    } else if (Array.isArray(data.result?.products)) {
+      products = data.result.products;
+    } else if (Array.isArray(data.result?.sync_products)) {
+      products = data.result.sync_products;
+    } else {
+      console.warn("⚠️ Unexpected format:", JSON.stringify(data, null, 2));
+      throw new Error("Unexpected Printful response structure");
     }
 
-    // 🧾 Build a price map of { product_id: retail_price }
+    // ✅ Build price map using first variant's price
     const priceMap = {};
-      data.result.forEach((product) => {
-    const productId = product.id;
-    const price = parseFloat(product.price || "0");
-    if (productId && price > 0) {
-      priceMap[productId] = price;
+    for (const p of products) {
+      const productId = p.id || p.product?.id;
+      const retailPrice = parseFloat(
+        p.sync_variants?.[0]?.retail_price ||
+        p.variants?.[0]?.price ||
+        p.price ||
+        "0"
+      );
+      if (productId && retailPrice > 0) {
+        priceMap[productId] = retailPrice;
+      }
     }
-  });
-
 
     return {
       statusCode: 200,
-      body: JSON.stringify({
-        success: true,
-        priceMap,
-      }),
+      body: JSON.stringify({ success: true, priceMap }),
     };
   } catch (error) {
     console.error("Printful Fetch Error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        success: false,
-        error: error.message,
-      }),
+      body: JSON.stringify({ success: false, error: error.message }),
     };
   }
 }
