@@ -2,31 +2,31 @@ import fetch from "node-fetch";
 
 export async function handler() {
   const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+  const STORE_ID = "17034634"; // ✅ your actual store ID
 
   try {
-    // Step 1: Fetch list of products
-    const res = await fetch("https://api.printful.com/store/products", {
-  headers: {
-    Authorization: `Bearer ${PRINTFUL_API_KEY}`,
-  },
-});
+    // Step 1: Fetch all products for this store
+    const res = await fetch(`https://api.printful.com/stores/${STORE_ID}/products`, {
+      headers: {
+        Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+      },
+    });
 
-const data = await res.json();
-console.log("🔥 Raw response from Printful:", JSON.stringify(data, null, 2));
+    const data = await res.json();
+    console.log("🧾 Full Printful Response:", JSON.stringify(data, null, 2));
 
-if (!Array.isArray(data.result)) {
-  throw new Error("Unexpected Printful response format (products)");
-}
-
+    if (!Array.isArray(data.result)) {
+      throw new Error("Unexpected Printful response format (products)");
+    }
 
     const priceMap = {};
 
-    // Step 2: Loop through products and fetch variant prices
+    // Step 2: Fetch variant prices for each product
     for (const product of data.result) {
       const productId = product.id;
 
       const detailRes = await fetch(
-        `https://api.printful.com/store/products/${productId}`,
+        `https://api.printful.com/stores/${STORE_ID}/products/${productId}`,
         {
           headers: {
             Authorization: `Bearer ${PRINTFUL_API_KEY}`,
@@ -35,9 +35,9 @@ if (!Array.isArray(data.result)) {
       );
 
       const detailData = await detailRes.json();
-
       const variants = detailData.result?.sync_variants;
-      if (Array.isArray(variants)) {
+
+      if (Array.isArray(variants) && variants.length > 0) {
         const firstVariant = variants[0];
         if (firstVariant?.retail_price) {
           priceMap[productId] = parseFloat(firstVariant.retail_price);
