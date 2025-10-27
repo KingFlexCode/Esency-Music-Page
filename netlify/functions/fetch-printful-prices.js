@@ -2,17 +2,15 @@ import fetch from "node-fetch";
 
 export async function handler() {
   const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
-  const STORE_ID = "17034634"; // ✅ your actual store ID
 
   try {
-    // Step 1: Fetch all products for this store
-    const res = await fetch(`https://api.printful.com/stores/${STORE_ID}/products`, {
+    const response = await fetch("https://api.printful.com/store/products", {
       headers: {
         Authorization: `Bearer ${PRINTFUL_API_KEY}`,
       },
     });
 
-    const data = await res.json();
+    const data = await response.json();
     console.log("🧾 Full Printful Response:", JSON.stringify(data, null, 2));
 
     if (!Array.isArray(data.result)) {
@@ -21,12 +19,12 @@ export async function handler() {
 
     const priceMap = {};
 
-    // Step 2: Fetch variant prices for each product
+    // Fetch product details for each item
     for (const product of data.result) {
       const productId = product.id;
 
       const detailRes = await fetch(
-        `https://api.printful.com/stores/${STORE_ID}/products/${productId}`,
+        `https://api.printful.com/store/products/${productId}`,
         {
           headers: {
             Authorization: `Bearer ${PRINTFUL_API_KEY}`,
@@ -44,8 +42,6 @@ export async function handler() {
         }
       }
     }
-
-    console.log("✅ Final Price Map:", priceMap);
 
     return {
       statusCode: 200,
