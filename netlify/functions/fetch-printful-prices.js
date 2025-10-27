@@ -14,6 +14,7 @@ export async function handler() {
     });
 
     const data = await response.json();
+    console.log("🔍 Raw Printful data:", JSON.stringify(data, null, 2));
 
     if (!data.result || !Array.isArray(data.result)) {
       throw new Error("Unexpected Printful response format");
