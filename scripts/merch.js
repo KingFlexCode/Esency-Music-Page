@@ -5,12 +5,14 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   const products = await fetchLiveProducts();
   if (products.length === 0) {
-    document.getElementById("merch-container").innerHTML = "<p style='text-align:center;'>No products found.</p>";
+    document.getElementById("merch-container").innerHTML =
+      "<p style='text-align:center;'>No products found.</p>";
     return;
   }
 
   renderMerch(products);
 
+  // 🛒 Add to cart handler
   document.body.addEventListener("click", (e) => {
     if (e.target.classList.contains("add-to-cart")) {
       const item = e.target.closest(".merch-item");
@@ -30,12 +32,15 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
+/* ----------------------------------------------------
+   🔄 Fetch live products from Netlify Printful function
+----------------------------------------------------- */
 async function fetchLiveProducts() {
   try {
     const res = await fetch("/.netlify/functions/fetch-printful-products");
     const data = await res.json();
-    if (data.success) {
-      return data.products || [];
+    if (data.success && Array.isArray(data.products)) {
+      return data.products;
     }
   } catch (err) {
     console.error("❌ Error loading products:", err);
@@ -43,25 +48,32 @@ async function fetchLiveProducts() {
   return [];
 }
 
+/* ----------------------------------------------------
+   🧱 Render the merch items on page
+----------------------------------------------------- */
 function renderMerch(products) {
   const merchContainer = document.getElementById("merch-container");
   merchContainer.innerHTML = "";
 
   const section = document.createElement("section");
   section.className = "merch-gallery";
-  section.innerHTML = `<div class="merch-section-header"><h1>Esency Merch</h1></div>`;
+  section.innerHTML = `
+    <div class="merch-section-header"><h1>Esency Merch</h1></div>
+  `;
 
   const gallery = document.createElement("div");
   gallery.className = "merch-grid";
 
   for (const product of products) {
-    const { id, name, price, thumbnail_url, sizes } = product;
+    const { id, name, price, thumbnail, sizes = ["S", "M", "L", "XL"] } = product;
 
-    const sizeOptions = sizes.map(s => `<option value="${s}">${s}</option>`).join("");
+    const sizeOptions = sizes
+      .map((size) => `<option value="${size}">${size}</option>`)
+      .join("");
 
     const html = `
       <div class="merch-item" data-id="${id}" data-price="${price}">
-        <img src="${thumbnail_url}" alt="${name}" />
+        <img src="${thumbnail}" alt="${name}" />
         <p class="product-name">${name}</p>
         <p class="product-price">$${price.toFixed(2)}</p>
         <div class="size-row">
@@ -81,6 +93,9 @@ function renderMerch(products) {
   merchContainer.appendChild(section);
 }
 
+/* ----------------------------------------------------
+   ✅ Show fading toast notification
+----------------------------------------------------- */
 function showToast(message) {
   let toast = document.getElementById("toast");
   if (!toast) {
@@ -91,5 +106,8 @@ function showToast(message) {
   }
   toast.textContent = message;
   toast.classList.add("show");
-  setTimeout(() => toast.classList.remove("show"), 2000);
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2000);
 }
