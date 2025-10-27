@@ -1,47 +1,48 @@
 import fetch from "node-fetch";
 
 export async function handler() {
-  try {
-    const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
-    const url = "https://api.printful.com/store/products";
+  const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
 
-    const response = await fetch(url, {
+  try {
+    // Step 1: Fetch list of products
+    const res = await fetch("https://api.printful.com/store/products", {
       headers: {
         Authorization: `Bearer ${PRINTFUL_API_KEY}`,
       },
     });
 
-    const data = await response.json();
-    console.log("🧾 Full Printful Response:", JSON.stringify(data, null, 2));
-    console.log("🔍 Raw Printful response keys:", Object.keys(data));
-
-    // ✅ Try to handle all possible shapes of Printful response
-    let products = [];
-    if (Array.isArray(data.result)) {
-      products = data.result;
-    } else if (Array.isArray(data.result?.products)) {
-      products = data.result.products;
-    } else if (Array.isArray(data.result?.sync_products)) {
-      products = data.result.sync_products;
-    } else {
-      console.warn("⚠️ Unexpected format:", JSON.stringify(data, null, 2));
-      throw new Error("Unexpected Printful response structure");
+    const data = await res.json();
+    if (!Array.isArray(data.result)) {
+      throw new Error("Unexpected Printful response format (products)");
     }
 
-    // ✅ Build price map using first variant's price
     const priceMap = {};
-    for (const p of products) {
-      const productId = p.id || p.product?.id;
-      const retailPrice = parseFloat(
-        p.sync_variants?.[0]?.retail_price ||
-        p.variants?.[0]?.price ||
-        p.price ||
-        "0"
+
+    // Step 2: Loop through products and fetch variant prices
+    for (const product of data.result) {
+      const productId = product.id;
+
+      const detailRes = await fetch(
+        `https://api.printful.com/store/products/${productId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+          },
+        }
       );
-      if (productId && retailPrice > 0) {
-        priceMap[productId] = retailPrice;
+
+      const detailData = await detailRes.json();
+
+      const variants = detailData.result?.sync_variants;
+      if (Array.isArray(variants)) {
+        const firstVariant = variants[0];
+        if (firstVariant?.retail_price) {
+          priceMap[productId] = parseFloat(firstVariant.retail_price);
+        }
       }
     }
+
+    console.log("✅ Final Price Map:", priceMap);
 
     return {
       statusCode: 200,
