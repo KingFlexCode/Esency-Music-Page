@@ -1,23 +1,16 @@
-/* ==========================================================
-   ESENCY MERCH PAGE — Dynamic Product Rendering with
-   Printful Live Prices + Local Caching
-   ========================================================== */
-
-import { PRODUCT_MAP } from "./product-map.js";
 import { addToCart, updateCartCount } from "./cart-utils.js";
 
-// --- Constants ---
-const PRICE_CACHE_KEY = "printfulPriceCache";
-const PRICE_CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours
-
-// --- Initialize ---
 document.addEventListener("DOMContentLoaded", async () => {
   updateCartCount();
 
-  const priceMap = await getCachedPrices();
-  renderMerch(priceMap);
+  const products = await fetchLiveProducts();
+  if (products.length === 0) {
+    document.getElementById("merch-container").innerHTML = "<p style='text-align:center;'>No products found.</p>";
+    return;
+  }
 
-  // 🛒 Add-to-cart listener
+  renderMerch(products);
+
   document.body.addEventListener("click", (e) => {
     if (e.target.classList.contains("add-to-cart")) {
       const item = e.target.closest(".merch-item");
@@ -27,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       const size = item.querySelector("select[name='size']").value;
 
       if (!size) {
-        alert("Please select a size first.");
+        alert("Please select a size.");
         return;
       }
 
@@ -37,102 +30,58 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
-/* ----------------------------------------------------------
-   🔄 Fetch or load cached prices
-   ---------------------------------------------------------- */
-async function getCachedPrices() {
+async function fetchLiveProducts() {
   try {
-    const cached = localStorage.getItem(PRICE_CACHE_KEY);
-    if (cached) {
-      const { timestamp, data } = JSON.parse(cached);
-      const now = Date.now();
-      if (now - timestamp < PRICE_CACHE_DURATION) {
-        console.log("💾 Using cached Printful prices");
-        return data;
-      }
-    }
-
-    const res = await fetch("/.netlify/functions/fetch-printful-prices");
-    const result = await res.json();
-
-  if (result.success) {
-    const data = result.priceMap;
-    localStorage.setItem(
-      
-      PRICE_CACHE_KEY,
-      JSON.stringify({ timestamp: Date.now(), data })
-    );
-    return data;
-  }else {
-      console.warn("⚠️ Failed to fetch live prices:", result.error);
+    const res = await fetch("/.netlify/functions/fetch-printful-products");
+    const data = await res.json();
+    if (data.success) {
+      return data.products || [];
     }
   } catch (err) {
-    console.error("❌ Error fetching prices:", err);
+    console.error("❌ Error loading products:", err);
   }
-  return {}; // fallback
+  return [];
 }
 
-/* ----------------------------------------------------------
-   🧱 Render merch dynamically from PRODUCT_MAP
-   ---------------------------------------------------------- */
-function renderMerch(priceMap = {}) {
+function renderMerch(products) {
   const merchContainer = document.getElementById("merch-container");
   merchContainer.innerHTML = "";
 
-  const grouped = {};
-  Object.entries(PRODUCT_MAP).forEach(([key, product]) => {
-    if (!grouped[product.category]) grouped[product.category] = [];
-    grouped[product.category].push({ key, ...product });
-  });
+  const section = document.createElement("section");
+  section.className = "merch-gallery";
+  section.innerHTML = `<div class="merch-section-header"><h1>Esency Merch</h1></div>`;
 
-  for (const [category, items] of Object.entries(grouped)) {
-    const section = document.createElement("section");
-    section.className = "merch-gallery";
-    section.innerHTML = `<div class="merch-section-header"><h1>${category}</h1></div>`;
+  const gallery = document.createElement("div");
+  gallery.className = "merch-grid";
 
-    const gallery = document.createElement("div");
-    gallery.className = "merch-grid";
+  for (const product of products) {
+    const { id, name, price, thumbnail_url, sizes } = product;
 
-    items.forEach((p) => {
-      const price = priceMap[p.product_id] || 35.0;
-      const sizes = Object.keys(p.variants)
-        .map((s) => `<option value="${s}">${s}</option>`)
-        .join("");
+    const sizeOptions = sizes.map(s => `<option value="${s}">${s}</option>`).join("");
 
-      const productHTML = `
-        <div class="merch-item" data-id="${p.key}" data-price="${price}">
-          <img src="${p.thumbnail}" alt="${p.key}">
-          <p class="product-name">${formatName(p.key)}</p>
-          <p class="product-price">$${price.toFixed(2)}</p>
-          <div class="size-row">
-            <label>Size:</label>
-            <select name="size">
-              <option value="">Select size</option>
-              ${sizes}
-            </select>
-          </div>
-          <button class="add-to-cart">Add to Cart</button>
+    const html = `
+      <div class="merch-item" data-id="${id}" data-price="${price}">
+        <img src="${thumbnail_url}" alt="${name}" />
+        <p class="product-name">${name}</p>
+        <p class="product-price">$${price.toFixed(2)}</p>
+        <div class="size-row">
+          <label>Size:</label>
+          <select name="size">
+            <option value="">Select size</option>
+            ${sizeOptions}
+          </select>
         </div>
-      `;
-      gallery.insertAdjacentHTML("beforeend", productHTML);
-    });
-
-    section.appendChild(gallery);
-    merchContainer.appendChild(section);
+        <button class="add-to-cart">Add to Cart</button>
+      </div>
+    `;
+    gallery.insertAdjacentHTML("beforeend", html);
   }
+
+  section.appendChild(gallery);
+  merchContainer.appendChild(section);
 }
 
-/* ----------------------------------------------------------
-   🧩 Utilities
-   ---------------------------------------------------------- */
-function formatName(key) {
-  return key
-    .replace(/-/g, " ")
-    .replace(/\s+/g, " ")
-    .replace(/\b\w/g, (l) => l.toUpperCase());
-}
-
-function showToast(message = "Added to cart.") {
+function showToast(message) {
   let toast = document.getElementById("toast");
   if (!toast) {
     toast = document.createElement("div");
