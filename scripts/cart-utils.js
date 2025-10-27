@@ -2,41 +2,43 @@
    CART UTILITIES — Shared LocalStorage Cart Logic
    ========================================================== */
 
-export function loadCart() {
-  return JSON.parse(localStorage.getItem("cart") || "[]");
-}
+  // scripts/cart-utils.js
 
-export function saveCart(cart) {
-  localStorage.setItem("cart", JSON.stringify(cart));
-}
+  const CART_KEY = "esency_cart";
 
-export function addToCart(id, name, price, size) {
-  const cart = loadCart();
-  const existing = cart.find(
-    (item) => item.id === id && item.size === size
-  );
+  // ✅ Save item to localStorage
+  export function addToCart(productId, name, price, size) {
+    const cart = getCart();
+    const existing = cart.find((item) => item.id === productId && item.size === size);
 
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ id, name, price, size, quantity: 1 });
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({ id: productId, name, price, size, qty: 1 });
+    }
+
+    localStorage.setItem(CART_KEY, JSON.stringify(cart));
+    updateCartCount();
   }
 
-  saveCart(cart);
-  updateCartCount();
-}
+  // ✅ Load cart from localStorage
+  export function getCart() {
+    const cart = localStorage.getItem(CART_KEY);
+    return cart ? JSON.parse(cart) : [];
+  }
 
-export function getCartCount(cart = loadCart()) {
-  return cart.reduce((sum, i) => sum + (i.quantity || 0), 0);
-}
+  // ✅ Count total items
+  export function updateCartCount() {
+    const cart = getCart();
+    const count = cart.reduce((sum, item) => sum + item.qty, 0);
+    const countEl = document.getElementById("cart-count");
+    if (countEl) {
+      countEl.textContent = count > 0 ? count : "";
+    }
+  }
 
-export function updateCartCount() {
-  const el = document.getElementById("cart-count");
-  if (!el) return;
-  el.textContent = getCartCount();
-}
-
-export function clearCart() {
-  localStorage.removeItem("cart");
-  updateCartCount();
-}
+  // ✅ Empty cart
+  export function clearCart() {
+    localStorage.removeItem(CART_KEY);
+    updateCartCount();
+  }
