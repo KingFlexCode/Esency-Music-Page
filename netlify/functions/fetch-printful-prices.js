@@ -12,6 +12,7 @@ export async function handler() {
     });
 
     const data = await response.json();
+    console.log("🧾 Full Printful Response:", JSON.stringify(data, null, 2));
     console.log("🔍 Raw Printful response keys:", Object.keys(data));
 
     // ✅ Try to handle all possible shapes of Printful response
