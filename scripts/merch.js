@@ -1,113 +1,62 @@
-import { addToCart, updateCartCount } from "./cart-utils.js";
+// merch.js
+import { addToCart, updateCartCountDisplay } from "./cart-utils.js";
 
-document.addEventListener("DOMContentLoaded", async () => {
-  updateCartCount();
-
-  const products = await fetchLiveProducts();
-  if (products.length === 0) {
-    document.getElementById("merch-container").innerHTML =
-      "<p style='text-align:center;'>No products found.</p>";
-    return;
-  }
-
-  renderMerch(products);
-
-  // 🛒 Add to cart handler
-  document.body.addEventListener("click", (e) => {
-    if (e.target.classList.contains("add-to-cart")) {
-      const item = e.target.closest(".merch-item");
-      const productId = item.dataset.id;
-      const name = item.querySelector(".product-name").textContent.trim();
-      const price = parseFloat(item.dataset.price);
-      const size = item.querySelector("select[name='size']").value;
-
-      if (!size) {
-        alert("Please select a size.");
-        return;
-      }
-
-      addToCart(productId, name, price, size);
-      showToast(`${name} (${size}) added to cart.`);
-    }
-  });
+document.addEventListener("DOMContentLoaded", () => {
+  updateCartCountDisplay();
+  fetchLiveProducts();
 });
 
-/* ----------------------------------------------------
-   🔄 Fetch live products from Netlify Printful function
------------------------------------------------------ */
 async function fetchLiveProducts() {
+  const merchContainer = document.getElementById("merch-container");
+  const loadingMsg = document.getElementById("loading-msg");
   try {
     const res = await fetch("/.netlify/functions/fetch-printful-products");
     const data = await res.json();
-    if (data.success && Array.isArray(data.products)) {
-      return data.products;
+
+    if (!data.success || !Array.isArray(data.products)) {
+      merchContainer.innerHTML = "<p>Error loading products.</p>";
+      return;
     }
+
+    loadingMsg.remove();
+
+    const grid = document.createElement("div");
+    grid.className = "product-grid";
+
+    data.products.forEach((product) => {
+      const item = document.createElement("div");
+      item.className = "product-card";
+
+      item.innerHTML = `
+        <img src="${product.thumbnail_url}" alt="${product.name}" class="product-img" />
+        <h3 class="product-name">${product.name}</h3>
+        <p class="product-price">$${product.price.toFixed(2)}</p>
+
+        <select class="product-size">
+          ${product.sizes.map((size) => `<option value="${size}">${size}</option>`).join("")}
+        </select>
+
+        <button class="add-to-cart-btn">Add to Cart</button>
+      `;
+
+      const addButton = item.querySelector(".add-to-cart-btn");
+      const sizeSelect = item.querySelector(".product-size");
+
+      addButton.addEventListener("click", () => {
+        addToCart(product.id, product.name, product.price, sizeSelect.value);
+        showToast("Added to cart!");
+      });
+
+      grid.appendChild(item);
+    });
+
+    merchContainer.appendChild(grid);
   } catch (err) {
-    console.error("❌ Error loading products:", err);
+    console.error("Error loading products:", err);
+    merchContainer.innerHTML = "<p>Failed to load products.</p>";
   }
-  return [];
 }
 
-/* ----------------------------------------------------
-   🧱 Render the merch items on page
------------------------------------------------------ */
-function renderMerch(products) {
-  const merchContainer = document.getElementById("merch-container");
-  merchContainer.innerHTML = "";
-
-  const section = document.createElement("section");
-  section.className = "merch-gallery";
-  section.innerHTML = `
-    <div class="merch-section-header"><h1>Esency Merch</h1></div>
-  `;
-
-  const gallery = document.createElement("div");
-  gallery.className = "merch-grid";
-
-  for (const product of products) {
-    const { id, name, price, thumbnail, sizes = ["S", "M", "L", "XL"] } = product;
-
-    const sizeOptions = sizes
-      .map((size) => `<option value="${size}">${size}</option>`)
-      .join("");
-
-    const html = `
-      <div class="merch-item" data-id="${id}" data-price="${price}">
-        <img src="${thumbnail}" alt="${name}" />
-        <p class="product-name">${name}</p>
-        <p class="product-price">$${price.toFixed(2)}</p>
-        <div class="size-row">
-          <label>Size:</label>
-          <select name="size">
-            <option value="">Select size</option>
-            ${sizeOptions}
-          </select>
-        </div>
-        <button class="add-to-cart">Add to Cart</button>
-      </div>
-    `;
-    gallery.insertAdjacentHTML("beforeend", html);
-  }
-
-  section.appendChild(gallery);
-  merchContainer.appendChild(section);
-}
-
-/* ----------------------------------------------------
-   ✅ Show fading toast notification
------------------------------------------------------ */
 function showToast(message) {
-  let toast = document.getElementById("toast");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "toast";
-    toast.className = "toast";
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add("show");
-
-  setTimeout(() => {
-    toast.classList.remove("show");
-  }, 2000);
-}
+  const toast = document.getElementById("toast");
+  toast.textConte
