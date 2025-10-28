@@ -82,7 +82,7 @@
   <main class="wrap">
     <div class="card">
       <h1>Thank you for your order!</h1>
-      <p class="muted">We’re getting it made. You’ll receive email updates with tracking soon.</p>
+      <p class="muted">We’re getting it made. You’ll receive email updates with tracking.</p>
       <p id="oid"></p>
       <a class="btn" href="./merch.html">Continue Shopping</a>
     </div>
@@ -91,14 +91,13 @@
   <script type="module">
     import { clearCart } from "../scripts/cart-utils.js";
 
-    // ✅ Clear local cart after order
     clearCart();
 
-    // ✅ Show order ID from session (if any)
-    const orderId = sessionStorage.getItem("lastOrderId");
-    if (orderId) {
-      document.getElementById("oid").textContent = "Order ID: " + orderId;
+    const id = sessionStorage.getItem("lastOrderId");
+    if (id) {
+      document.getElementById("oid").textContent = "Order ID: " + id;
     }
   </script>
 </body>
 </html>
+
