@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 async function fetchLiveProducts() {
   const merchContainer = document.getElementById("merch-container");
   const loadingMsg = document.getElementById("loading-msg");
+
   try {
     const res = await fetch("/.netlify/functions/fetch-printful-products");
     const data = await res.json();
@@ -18,7 +19,8 @@ async function fetchLiveProducts() {
       return;
     }
 
-    loadingMsg.remove();
+    // Remove loading text
+    if (loadingMsg) loadingMsg.remove();
 
     const grid = document.createElement("div");
     grid.className = "product-grid";
@@ -43,8 +45,12 @@ async function fetchLiveProducts() {
       const sizeSelect = item.querySelector(".product-size");
 
       addButton.addEventListener("click", () => {
+        if (!sizeSelect.value) {
+          showToast("Please select a size.");
+          return;
+        }
         addToCart(product.id, product.name, product.price, sizeSelect.value);
-        showToast("Added to cart!");
+        showToast(`${product.name} (${sizeSelect.value}) added to cart!`);
       });
 
       grid.appendChild(item);
@@ -58,5 +64,18 @@ async function fetchLiveProducts() {
 }
 
 function showToast(message) {
-  const toast = document.getElementById("toast");
-  toast.textConte
+  let toast = document.getElementById("toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "toast";
+    toast.className = "toast";
+    document.body.appendChild(toast);
+  }
+
+  toast.textContent = message;
+  toast.classList.add("show");
+
+  setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2500);
+}
