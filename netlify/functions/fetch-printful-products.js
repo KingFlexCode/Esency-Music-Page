@@ -1,15 +1,14 @@
-// netlify/functions/fetch-printful-products.js
 import fetch from "node-fetch";
 
 export async function handler() {
+  const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
+  const STORE_ID = "17034634"; // your store ID
+
+  const baseUrl = `https://api.printful.com/stores/${STORE_ID}/products`;
+
   try {
-    const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
-    const STORE_ID = "17034634"; // your store ID
-
-    // ✅ Correct URL format (store ID in path, not query)
-    const url = `https://api.printful.com/stores/${STORE_ID}/products`;
-
-    const response = await fetch(url, {
+    // Step 1: Fetch all products
+    const response = await fetch(baseUrl, {
       headers: {
         Authorization: `Bearer ${PRINTFUL_API_KEY}`,
         "Content-Type": "application/json",
@@ -17,9 +16,6 @@ export async function handler() {
     });
 
     const data = await response.json();
-    console.log("🧾 Full Printful Response:", JSON.stringify(data, null, 2));
-
-    // ✅ Ensure products exist
     if (!data || !Array.isArray(data.result)) {
       console.warn("⚠️ Unexpected format or no products found");
       return {
@@ -28,16 +24,39 @@ export async function handler() {
       };
     }
 
-    // ✅ Map only necessary fields
-    const products = data.result.map((p) => ({
-      id: p.id,
-      name: p.name,
-      thumbnail_url: p.thumbnail_url,
-      price: 35.0, // fallback placeholder
-      sizes: ["S", "M", "L", "XL", "XXL"],
-    }));
+    // Step 2: Fetch price for each product by ID
+    const detailedProducts = await Promise.all(
+      data.result.map(async (p) => {
+        const detailUrl = `https://api.printful.com/store/products/${p.id}`;
+        try {
+          const detailRes = await fetch(detailUrl, {
+            headers: {
+              Authorization: `Bearer ${PRINTFUL_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+          });
+          const detailData = await detailRes.json();
 
-    console.log(`✅ Returned ${products.length} product(s)`);
+          const variant = detailData?.result?.sync_variants?.[0];
+          const price = variant?.retail_price || "0.00";
+
+          return {
+            id: p.id,
+            name: p.name,
+            thumbnail_url: p.thumbnail_url,
+            price: parseFloat(price),
+            sizes: ["S", "M", "L", "XL", "XXL"],
+          };
+        } catch (error) {
+          console.error(`❌ Error fetching details for product ${p.id}:`, error);
+          return null;
+        }
+      })
+    );
+
+    const products = detailedProducts.filter((p) => p !== null);
+
+    console.log(`✅ Final product count: ${products.length}`);
     return {
       statusCode: 200,
       body: JSON.stringify({ success: true, products }),
