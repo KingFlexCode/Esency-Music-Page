@@ -19,8 +19,7 @@ async function fetchLiveProducts() {
       return;
     }
 
-    // Remove loading text
-    if (loadingMsg) loadingMsg.remove();
+    loadingMsg.remove();
 
     const grid = document.createElement("div");
     grid.className = "product-grid";
@@ -45,12 +44,8 @@ async function fetchLiveProducts() {
       const sizeSelect = item.querySelector(".product-size");
 
       addButton.addEventListener("click", () => {
-        if (!sizeSelect.value) {
-          showToast("Please select a size.");
-          return;
-        }
         addToCart(product.id, product.name, product.price, sizeSelect.value);
-        showToast(`${product.name} (${sizeSelect.value}) added to cart!`);
+        showToast("Added to cart!");
       });
 
       grid.appendChild(item);
@@ -64,18 +59,12 @@ async function fetchLiveProducts() {
 }
 
 function showToast(message) {
-  let toast = document.getElementById("toast");
-  if (!toast) {
-    toast = document.createElement("div");
-    toast.id = "toast";
-    toast.className = "toast";
-    document.body.appendChild(toast);
-  }
+  const toast = document.getElementById("toast");
+  if (!toast) return;
 
   toast.textContent = message;
-  toast.classList.add("show");
-
+  toast.classList.add("visible");
   setTimeout(() => {
-    toast.classList.remove("show");
+    toast.classList.remove("visible");
   }, 2500);
 }

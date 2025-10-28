@@ -16,7 +16,7 @@ export function addToCart(productId, name, price, size) {
   }
 
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  updateCartCount();
+  updateCartCountDisplay();
 }
 
 // ✅ Load cart from localStorage
@@ -26,7 +26,7 @@ export function getCart() {
 }
 
 // ✅ Count total items
-export function updateCartCount() {
+export function updateCartCountDisplay() {
   const cart = getCart();
   const count = cart.reduce((sum, item) => sum + item.quantity, 0);
   const countEl = document.getElementById("cart-count");
@@ -43,5 +43,5 @@ export function saveCart(cart) {
 // ✅ Empty cart
 export function clearCart() {
   localStorage.removeItem(CART_KEY);
-  updateCartCount();
+  updateCartCountDisplay();
 }
