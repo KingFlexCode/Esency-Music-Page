@@ -2,12 +2,12 @@ import { addToCart, updateCartCountDisplay } from './cart-utils.js';
 
 let productData = [];
 
-// Fetch products from your Netlify function
+// Fetch products from the Netlify function
 async function loadProducts() {
   try {
     const res = await fetch('/.netlify/functions/fetch-printful-products');
     const data = await res.json();
-    productData = data.result || data.products || [];
+    productData = data.products || data.result || [];
     renderProducts(productData);
     updateCartCountDisplay();
   } catch (err) {
@@ -17,42 +17,82 @@ async function loadProducts() {
   }
 }
 
-// Render a list of products into the grid
+// Render all products and attach events
 function renderProducts(products) {
   const grid = document.getElementById('product-list');
   grid.innerHTML = '';
+
   products.forEach((item) => {
-    const name = item.name || item.sync_product?.name || 'Item';
-    const price = parseFloat(
-      item.sync_variants?.[0]?.retail_price ||
-        item.variants?.[0]?.retail_price ||
-        0
+    const name = item.name || 'Item';
+    const variants = item.variants || [];
+    // Use default_price or first variant’s price
+    let price = parseFloat(
+      item.default_price || (variants[0]?.price ?? 0)
     ).toFixed(2);
-    const image =
-      item.thumbnail_url || item.sync_product?.thumbnail_url || '';
+
+    // Create card
     const card = document.createElement('div');
     card.className = 'product-card';
+
+    // Build variant select dropdown if variants exist
+    let variantSelectHTML = '';
+    if (variants.length > 0) {
+      const options = variants
+        .map((v) => {
+          const label = v.size || v.name || v.color || 'Option';
+          return `<option value="${v.id}" data-price="${v.price}" data-size="${v.size || ''}" data-name="${v.name || ''}">${label}</option>`;
+        })
+        .join('');
+      variantSelectHTML = `<select class="variant-select">${options}</select>`;
+    }
+
     card.innerHTML = `
-      <img src="${image}" alt="${name}" class="product-img">
+      <img src="${item.thumbnail_url || ''}" alt="${name}" class="product-img">
       <h3 class="product-name">${name}</h3>
       <p class="product-price">$${price}</p>
-      <button class="add-to-cart-btn" data-id="${item.id}" data-name="${name}" data-price="${price}">Add to Cart</button>
+      ${variantSelectHTML}
+      <button class="add-to-cart-btn">Add to Cart</button>
     `;
     grid.appendChild(card);
-  });
 
-  grid.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+    // Handle variant change: update displayed price
+    const selectEl = card.querySelector('.variant-select');
+    if (selectEl) {
+      selectEl.addEventListener('change', (e) => {
+        const opt = e.target.options[e.target.selectedIndex];
+        const newPrice = parseFloat(opt.dataset.price).toFixed(2);
+        card.querySelector('.product-price').textContent = `$${newPrice}`;
+      });
+    }
+
+    // Add to Cart behaviour
+    const btn = card.querySelector('.add-to-cart-btn');
     btn.addEventListener('click', () => {
-      const id = btn.dataset.id;
-      const name = btn.dataset.name;
-      const price = parseFloat(btn.dataset.price);
-      addToCart({ id, name, price, quantity: 1, size: null });
+      let variantId = item.id;
+      let priceVal = parseFloat(price);
+      let sizeVal = null;
+
+      // If variants exist, use the selected variant
+      if (selectEl) {
+        const opt = selectEl.options[selectEl.selectedIndex];
+        variantId = opt.value;
+        priceVal = parseFloat(opt.dataset.price);
+        sizeVal = opt.dataset.size || null;
+      }
+
+      addToCart({
+        id: variantId,
+        productId: item.id,    // parent product ID for reference
+        name: name,
+        price: priceVal,
+        size: sizeVal,
+      });
       showToast(`${name} added to cart`);
     });
   });
 }
 
-// Toast notification when an item is added
+// Toast notification
 function showToast(msg) {
   const toast = document.getElementById('toast');
   toast.textContent = msg;
@@ -60,21 +100,19 @@ function showToast(msg) {
   setTimeout(() => toast.classList.remove('show'), 1500);
 }
 
-// Set up category filters (All, T‑shirts, Hoodies, Accessories)
+// Category filter setup (unchanged)
 function setupFilters() {
   document.querySelectorAll('.filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      document
-        .querySelectorAll('.filter-btn')
-        .forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       const category = btn.dataset.category;
       const filtered =
         category === 'all'
           ? productData
           : productData.filter((p) => {
-              const name = p.name || p.sync_product?.name || '';
-              return name.toLowerCase().includes(category.toLowerCase());
+              const title = p.name || '';
+              return title.toLowerCase().includes(category.toLowerCase());
             });
       renderProducts(filtered);
     });

@@ -91,3 +91,12 @@
   background: #f76b0a;
   color: #111;
 }
+.product-card select.variant-select {
+  margin: 8px auto;
+  padding: 6px;
+  width: 90%;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #1a1a1a;
+  color: #fff;
+}
