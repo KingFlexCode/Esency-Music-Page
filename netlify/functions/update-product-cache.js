@@ -1,43 +1,75 @@
-// /netlify/functions/update-printful-cache.js
-import fetch from "node-fetch";
-import fs from "fs";
-import path from "path";
+// netlify/functions/update-product-cache.js
+import fetch from 'node-fetch';
+import { set } from '@netlify/blobs';
 
 export async function handler() {
   const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
-  const url = `https://api.printful.com/store/products`;
+  if (!PRINTFUL_API_KEY) {
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        success: false,
+        error: 'Missing PRINTFUL_API_KEY environment variable.',
+      }),
+    };
+  }
+
+  const allProducts = [];
+  let page = 1;
+  const limit = 20;
 
   try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${PRINTFUL_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
+    // Paginate through Printful API
+    while (true) {
+      const res = await fetch(
+        `https://api.printful.com/store/products?page=${page}&limit=${limit}`,
+        {
+          headers: { Authorization: `Bearer ${PRINTFUL_API_KEY}` },
+        }
+      );
 
-    const data = await response.json();
+      if (!res.ok) {
+        throw new Error(`Printful API failed (${res.status}): ${res.statusText}`);
+      }
 
-    if (!data || !Array.isArray(data.result)) {
-      throw new Error("No products found or unexpected format.");
+      const data = await res.json();
+      if (!Array.isArray(data.result) || data.result.length === 0) break;
+
+      allProducts.push(...data.result);
+      console.log(`✅ Page ${page} loaded (${data.result.length} products)`);
+
+      // Stop if no more pages
+      if (data.paging && data.paging.total_pages <= page) break;
+      page++;
+
+      // Respect Printful rate limits (pause 1s per page)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    const mapped = data.result.map((p) => ({
+    const mapped = allProducts.map((p) => ({
       id: p.id,
       name: p.name,
       thumbnail_url: p.thumbnail_url,
-      price: 35.0, // Or pull from variant
-      sizes: ["S", "M", "L", "XL", "XXL"],
+      price:
+        p.sync_variants?.[0]?.retail_price ||
+        p.variants?.[0]?.retail_price ||
+        'N/A',
+      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
     }));
 
-    const filePath = path.resolve("data", "printful-cache.json");
-    fs.writeFileSync(filePath, JSON.stringify({ updated: Date.now(), products: mapped }, null, 2));
+    // Save to Netlify Blob
+    await set('printful-cache', JSON.stringify({ updated: Date.now(), products: mapped }));
 
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, count: mapped.length }),
+      body: JSON.stringify({
+        success: true,
+        count: mapped.length,
+        message: 'Printful cache updated successfully.',
+      }),
     };
   } catch (err) {
-    console.error("❌ Update failed:", err.message);
+    console.error('❌ Cache update failed:', err.message);
     return {
       statusCode: 500,
       body: JSON.stringify({ success: false, error: err.message }),

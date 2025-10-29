@@ -17,3 +17,6 @@ build/
 .env.*
 
 git rm -r --cached .DS_Store
+
+# Local Netlify folder
+.netlify
