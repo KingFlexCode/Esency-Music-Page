@@ -47,6 +47,13 @@
 
   <!-- MAIN -->
   <main id="merch-container">
+    <div class="filter-bar">
+      <button data-category="all" class="filter-btn active">All</button>
+      <button data-category="T-shirt" class="filter-btn">T-Shirts</button>
+      <button data-category="Hoodie" class="filter-btn">Hoodies</button>
+      <button data-category="Accessory" class="filter-btn">Accessories</button>
+    </div>
+
     <div class="merch-section-header">
       <h1>Merch</h1>
     </div>
@@ -64,5 +71,8 @@
 
   <!-- ✅ FIXED: use ES modules -->
   <script type="module" src="../scripts/merch.js"></script>
+  <div id="product-list" class="product-grid"></div>
+  <script src="../scripts/printful.js"></script>
+
 </body>
 </html>

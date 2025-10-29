@@ -433,3 +433,24 @@ footer {
 .toast.show {
   opacity: 1;
 }
+.filter-bar {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.filter-btn {
+  background: #222;
+  border: 1px solid #f76b0a;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  margin: 0 0.3rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.filter-btn.active,
+.filter-btn:hover {
+  background: #f76b0a;
+  color: #111;
+}
