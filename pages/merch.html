@@ -4,28 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Esency Merch</title>
-
-  <!-- STYLES -->
   <link rel="stylesheet" href="../styles/styles.css" />
   <link rel="stylesheet" href="../styles/styles-merch.css" />
-
-  <style>
-    /* Quick fallback styles if merch.js takes a second to load */
-    #merch-container {
-      text-align: center;
-      padding: 40px 20px;
-      color: #ddd;
-      font-size: 1.1em;
-    }
-    .merch-section-header h1 {
-      text-align: center;
-      color: white;
-      margin-top: 40px;
-      margin-bottom: 10px;
-    }
-  </style>
 </head>
-
 <body>
   <!-- HEADER -->
   <header class="nav-header">
@@ -39,26 +20,20 @@
       <a href="./links.html">Links</a>
       <a href="./bio.html">Bio</a>
       <a href="./contact.html">Contact</a>
-      <a href="./cart.html" id="cart-button" class="cart-link">
-        🛒 Cart (<span id="cart-count">0</span>)
-      </a>
+      <a href="./cart.html" id="cart-button" class="cart-link">🛒 Cart (<span id="cart-count">0</span>)</a>
     </nav>
   </header>
 
   <!-- MAIN -->
-  <main id="merch-container">
+  <main>
+    <h1 style="text-align:center; margin-top: 2rem;">Merchandise</h1>
     <div class="filter-bar">
       <button data-category="all" class="filter-btn active">All</button>
-      <button data-category="T-shirt" class="filter-btn">T-Shirts</button>
+      <button data-category="T-shirt" class="filter-btn">T‑Shirts</button>
       <button data-category="Hoodie" class="filter-btn">Hoodies</button>
       <button data-category="Accessory" class="filter-btn">Accessories</button>
     </div>
-
-    <div class="merch-section-header">
-      <h1>Merch</h1>
-    </div>
-    <p id="loading-msg" style="text-align:center; opacity:0.7;">Loading products...</p>
-    <!-- merch.js will replace this area with product grid -->
+    <section id="product-list" class="product-grid"></section>
   </main>
 
   <!-- FOOTER -->
@@ -69,10 +44,8 @@
   <!-- TOAST -->
   <div id="toast" class="toast">Added to cart.</div>
 
-  <!-- ✅ FIXED: use ES modules -->
+  <!-- Scripts -->
+  <script type="module" src="../scripts/cart-utils.js"></script>
   <script type="module" src="../scripts/merch.js"></script>
-  <div id="product-list" class="product-grid"></div>
-  <script src="../scripts/printful.js"></script>
-
 </body>
 </html>

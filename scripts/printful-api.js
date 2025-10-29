@@ -1,13 +1,17 @@
-// scripts/printful-api.js
+/* =========================================================================
+   Printful API proxy
+   Calls Netlify serverless function to create an order.
+   ========================================================================= */
 
-export async function createPrintfulOrder(orderData) {
-  const response = await fetch("/.netlify/functions/create-printful-order", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(orderData),
+export async function createPrintfulOrder(cartItems) {
+  const response = await fetch('/.netlify/functions/create-printful-order', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ items: cartItems }),
   });
-
-  const result = await response.json();
-  if (!response.ok) throw new Error(result.message || "Printful API error");
-  return result;
+  if (!response.ok) {
+    throw new Error(`Printful order failed: ${response.status}`);
+  }
+  const data = await response.json();
+  return data; // { id: 'orderId', ... }
 }

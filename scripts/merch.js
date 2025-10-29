@@ -1,70 +1,87 @@
-// merch.js
-import { addToCart, updateCartCountDisplay } from "./cart-utils.js";
+import { addToCart, updateCartCountDisplay } from './cart-utils.js';
 
-document.addEventListener("DOMContentLoaded", () => {
-  updateCartCountDisplay();
-  fetchLiveProducts();
-});
+let productData = [];
 
-async function fetchLiveProducts() {
-  const merchContainer = document.getElementById("merch-container");
-  const loadingMsg = document.getElementById("loading-msg");
-
+// Fetch products from your Netlify function
+async function loadProducts() {
   try {
-    const res = await fetch("/.netlify/functions/fetch-printful-products");
+    const res = await fetch('/.netlify/functions/fetch-printful-products');
     const data = await res.json();
-
-    if (!data.success || !Array.isArray(data.products)) {
-      merchContainer.innerHTML = "<p>Error loading products.</p>";
-      return;
-    }
-
-    loadingMsg.remove();
-
-    const grid = document.createElement("div");
-    grid.className = "product-grid";
-
-    data.products.forEach((product) => {
-      const item = document.createElement("div");
-      item.className = "product-card";
-
-      item.innerHTML = `
-        <img src="${product.thumbnail_url}" alt="${product.name}" class="product-img" />
-        <h3 class="product-name">${product.name}</h3>
-        <p class="product-price">$${product.price.toFixed(2)}</p>
-
-        <select class="product-size">
-          ${product.sizes.map((size) => `<option value="${size}">${size}</option>`).join("")}
-        </select>
-
-        <button class="add-to-cart-btn">Add to Cart</button>
-      `;
-
-      const addButton = item.querySelector(".add-to-cart-btn");
-      const sizeSelect = item.querySelector(".product-size");
-
-      addButton.addEventListener("click", () => {
-        addToCart(product.id, product.name, product.price, sizeSelect.value);
-        showToast("Added to cart!");
-      });
-
-      grid.appendChild(item);
-    });
-
-    merchContainer.appendChild(grid);
+    productData = data.result || data.products || [];
+    renderProducts(productData);
+    updateCartCountDisplay();
   } catch (err) {
-    console.error("Error loading products:", err);
-    merchContainer.innerHTML = "<p>Failed to load products.</p>";
+    console.error(err);
+    document.getElementById('product-list').textContent =
+      'Error loading products.';
   }
 }
 
-function showToast(message) {
-  const toast = document.getElementById("toast");
-  if (!toast) return;
+// Render a list of products into the grid
+function renderProducts(products) {
+  const grid = document.getElementById('product-list');
+  grid.innerHTML = '';
+  products.forEach((item) => {
+    const name = item.name || item.sync_product?.name || 'Item';
+    const price = parseFloat(
+      item.sync_variants?.[0]?.retail_price ||
+        item.variants?.[0]?.retail_price ||
+        0
+    ).toFixed(2);
+    const image =
+      item.thumbnail_url || item.sync_product?.thumbnail_url || '';
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      <img src="${image}" alt="${name}" class="product-img">
+      <h3 class="product-name">${name}</h3>
+      <p class="product-price">$${price}</p>
+      <button class="add-to-cart-btn" data-id="${item.id}" data-name="${name}" data-price="${price}">Add to Cart</button>
+    `;
+    grid.appendChild(card);
+  });
 
-  toast.textContent = message;
-  toast.classList.add("visible");
-  setTimeout(() => {
-    toast.classList.remove("visible");
-  }, 2500);
+  grid.querySelectorAll('.add-to-cart-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.id;
+      const name = btn.dataset.name;
+      const price = parseFloat(btn.dataset.price);
+      addToCart({ id, name, price, quantity: 1, size: null });
+      showToast(`${name} added to cart`);
+    });
+  });
 }
+
+// Toast notification when an item is added
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 1500);
+}
+
+// Set up category filters (All, T‑shirts, Hoodies, Accessories)
+function setupFilters() {
+  document.querySelectorAll('.filter-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      document
+        .querySelectorAll('.filter-btn')
+        .forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      const category = btn.dataset.category;
+      const filtered =
+        category === 'all'
+          ? productData
+          : productData.filter((p) => {
+              const name = p.name || p.sync_product?.name || '';
+              return name.toLowerCase().includes(category.toLowerCase());
+            });
+      renderProducts(filtered);
+    });
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProducts();
+  setupFilters();
+});

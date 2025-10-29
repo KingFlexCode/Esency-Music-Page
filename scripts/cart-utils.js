@@ -1,47 +1,54 @@
-/* ==========================================================
-   CART UTILITIES — Shared LocalStorage Cart Logic
-   ========================================================== */
+/* =========================================================================
+   Cart Utilities for Esency merch
+   Handles: load cart from localStorage, save cart, add item, clear cart,
+            get cart count, update cart count display.
+   ========================================================================= */
 
-const CART_KEY = "esency_cart";
+const CART_KEY = 'esencyCart';
 
-// ✅ Save item to localStorage
-export function addToCart(productId, name, price, size) {
-  const cart = getCart();
-  const existing = cart.find((item) => item.id === productId && item.size === size);
-
-  if (existing) {
-    existing.quantity += 1;
-  } else {
-    cart.push({ id: productId, name, price, size, quantity: 1 });
-  }
-
-  localStorage.setItem(CART_KEY, JSON.stringify(cart));
-  updateCartCountDisplay();
-}
-
-// ✅ Load cart from localStorage
-export function getCart() {
-  const cart = localStorage.getItem(CART_KEY);
-  return cart ? JSON.parse(cart) : [];
-}
-
-// ✅ Count total items
-export function updateCartCountDisplay() {
-  const cart = getCart();
-  const count = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const countEl = document.getElementById("cart-count");
-  if (countEl) {
-    countEl.textContent = count > 0 ? count : "";
+export function loadCart() {
+  const raw = localStorage.getItem(CART_KEY);
+  try {
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
   }
 }
 
-// ✅ Save cart to localStorage (used in cart.js)
 export function saveCart(cart) {
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
 }
 
-// ✅ Empty cart
+export function getCart() {
+  return loadCart();
+}
+
+export function getCartCount() {
+  return loadCart().reduce((sum, item) => sum + (item.quantity || 1), 0);
+}
+
+export function updateCartCountDisplay() {
+  const countEl = document.getElementById('cart-count');
+  if (countEl) {
+    countEl.textContent = getCartCount();
+  }
+}
+
+export function addToCart(product) {
+  const cart = loadCart();
+  const existing = cart.find(
+    (item) => item.id === product.id && item.size === product.size
+  );
+  if (existing) {
+    existing.quantity += product.quantity || 1;
+  } else {
+    cart.push({ ...product, quantity: product.quantity || 1 });
+  }
+  saveCart(cart);
+  updateCartCountDisplay();
+}
+
 export function clearCart() {
-  localStorage.removeItem(CART_KEY);
+  saveCart([]);
   updateCartCountDisplay();
 }
