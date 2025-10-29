@@ -9,3 +9,6 @@
   name = "sync-printful-merch-nightly"
   cron = "0 3 * * *" # Runs every day at 3am UTC
   function = "sync-printful-merch"
+
+[functions."update-printful-cache"]
+  schedule = "0 4 * * *" # Run daily at 4 AM UTC

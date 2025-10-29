@@ -1,48 +1,22 @@
-// netlify/functions/fetch-printful-products.js
-import fetch from "node-fetch";
+// /netlify/functions/fetch-printful-products.js
+import fs from "fs";
+import path from "path";
 
 export async function handler() {
-  const PRINTFUL_API_KEY = process.env.PRINTFUL_API_KEY;
-
-  const url = "https://api.printful.com/store/products";
-
   try {
-    const response = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${PRINTFUL_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-    });
+    const filePath = path.resolve("data", "printful-cache.json");
+    const file = fs.readFileSync(filePath, "utf-8");
+    const cached = JSON.parse(file);
 
-    const data = await response.json();
-    console.log("🧾 Full Printful Response:", JSON.stringify(data, null, 2));
-
-    if (!data || !Array.isArray(data.result)) {
-      console.warn("⚠️ Unexpected format or no products found");
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ success: true, products: [] }),
-      };
-    }
-
-    const products = data.result.map((p) => ({
-      id: p.id,
-      name: p.name,
-      thumbnail_url: p.thumbnail_url,
-      price: 35.0, // static placeholder
-      sizes: ["S", "M", "L", "XL", "XXL"], // example default
-    }));
-
-    console.log(`✅ Returned ${products.length} product(s)`);
     return {
       statusCode: 200,
-      body: JSON.stringify({ success: true, products }),
+      body: JSON.stringify({ success: true, ...cached }),
     };
-  } catch (error) {
-    console.error("❌ Printful Fetch Error:", error);
+  } catch (err) {
+    console.error("❌ Read cache failed:", err.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, error: error.message }),
+      body: JSON.stringify({ success: false, error: "Could not read cached data." }),
     };
   }
 }
