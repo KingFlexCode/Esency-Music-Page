@@ -1,5 +1,6 @@
 import fetch from 'node-fetch';
-import { getStore } from '@netlify/blobs';
+import fs from 'fs';
+import path from 'path';
 
 export async function handler() {
   const API_KEY = process.env.PRINTFUL_API_KEY;
@@ -9,9 +10,6 @@ export async function handler() {
       body: JSON.stringify({ success: false, error: 'Missing PRINTFUL_API_KEY' }),
     };
   }
-
-  // ✅ Create (or open) a store named "printful-cache"
-  const store = getStore('printful-cache');
 
   const allProducts = [];
   let page = 1;
@@ -31,7 +29,7 @@ export async function handler() {
       allProducts.push(...data.result);
       if (data.paging && page >= data.paging.total_pages) break;
       page++;
-      await new Promise((r) => setTimeout(r, 1000)); // rate limit delay
+      await new Promise((r) => setTimeout(r, 1000)); // rate limit pause
     }
 
     const mapped = allProducts.map((p) => ({
@@ -44,14 +42,20 @@ export async function handler() {
         'N/A',
     }));
 
-    await store.set('latest', JSON.stringify({ updated: Date.now(), products: mapped }));
+    // ✅ Save locally as a file
+    const dataDir = path.resolve('data');
+    if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+    fs.writeFileSync(
+      path.join(dataDir, 'printful-cache.json'),
+      JSON.stringify({ updated: Date.now(), products: mapped }, null, 2)
+    );
 
     return {
       statusCode: 200,
       body: JSON.stringify({
         success: true,
         count: mapped.length,
-        message: '✅ Printful cache updated successfully',
+        message: '✅ Printful cache updated successfully (file version)',
       }),
     };
   } catch (err) {
@@ -62,3 +66,4 @@ export async function handler() {
     };
   }
 }
+

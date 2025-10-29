@@ -1,21 +1,22 @@
+import fs from 'fs';
+import path from 'path';
 import fetch from 'node-fetch';
-import { getStore } from '@netlify/blobs';
 
 export async function handler() {
   try {
-    // ✅ Connect to the same store
-    const store = getStore('printful-cache');
-    const blob = await store.get('latest');
+    const cachePath = path.resolve('data', 'printful-cache.json');
 
-    if (blob) {
-      const cached = JSON.parse(await blob.text());
+    // ✅ Read local file cache if it exists
+    if (fs.existsSync(cachePath)) {
+      const fileData = fs.readFileSync(cachePath, 'utf-8');
+      const cached = JSON.parse(fileData);
       return {
         statusCode: 200,
         body: JSON.stringify({ success: true, ...cached }),
       };
     }
 
-    // fallback: fetch directly from Printful
+    // fallback to live fetch
     const API_KEY = process.env.PRINTFUL_API_KEY;
     const res = await fetch('https://api.printful.com/store/products', {
       headers: { Authorization: `Bearer ${API_KEY}` },
@@ -34,3 +35,4 @@ export async function handler() {
     };
   }
 }
+
