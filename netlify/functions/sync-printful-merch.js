@@ -11,7 +11,7 @@ try {
 }
 const fs = require("fs");
 
-exports.handler = async () => {
+export async function handler() {
   try {
     console.log("🚀 Starting Printful merch sync with full variant fetch...");
 

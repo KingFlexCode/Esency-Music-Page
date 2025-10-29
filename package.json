@@ -2,8 +2,12 @@
   "name": "esency-music-page",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "start": "netlify dev"
+  },
   "dependencies": {
     "@netlify/blobs": "^10.3.0",
     "node-fetch": "^3.3.2"
   }
 }
+
