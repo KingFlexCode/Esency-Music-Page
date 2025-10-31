@@ -22,7 +22,7 @@ export async function handler() {
   try {
     console.log('🔄 Fetching all Printful products...');
 
-    // 1️⃣ Fetch all base products (paged)
+    // 1️⃣ Fetch all base products
     while (true) {
       const response = await fetch(
         `https://api.printful.com/store/products?page=${page}&limit=${limit}`,
@@ -40,20 +40,22 @@ export async function handler() {
       allProducts.push(...data.result);
       console.log(`✅ Fetched page ${page}, total so far: ${allProducts.length}`);
 
-      // Stop if no more pages
       if (data.paging && page >= data.paging.total_pages) break;
       page++;
 
-      // Respect API rate limits (avoid 429)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 800));
     }
 
     console.log(`📦 Total products fetched: ${allProducts.length}`);
 
-    // 2️⃣ For each product, fetch full details with variants
+    // 2️⃣ Limit to first few (your merch items only)
+    const targetProducts = allProducts.slice(0, 10);
+    console.log(`🧩 Processing first ${targetProducts.length} products...`);
+
     const fullProducts = [];
 
-    for (const baseProduct of allProducts) {
+    for (const baseProduct of targetProducts) {
       try {
         const detailRes = await fetch(
           `https://api.printful.com/store/products/${baseProduct.id}`,
@@ -65,7 +67,7 @@ export async function handler() {
         if (detailRes.ok && detailData.result) {
           const detail = detailData.result;
 
-          // Extract all variant info
+          // Extract variant info
           const variants = Array.isArray(detail.variants)
             ? detail.variants.map((v) => ({
                 id: v.id,
@@ -77,7 +79,6 @@ export async function handler() {
               }))
             : [];
 
-          // Use first variant price as default
           const defaultPrice = variants.length > 0 ? variants[0].price : '';
 
           fullProducts.push({
@@ -91,7 +92,6 @@ export async function handler() {
 
           console.log(`✅ Cached ${baseProduct.name} (${variants.length} variants)`);
         } else {
-          // Fallback minimal info if variant fetch fails
           fullProducts.push({
             id: baseProduct.id,
             name: baseProduct.name,
@@ -101,6 +101,10 @@ export async function handler() {
           });
           console.warn(`⚠️ Could not fetch details for ${baseProduct.name}`);
         }
+
+        // small delay for API rate limits
+        await new Promise((resolve) => setTimeout(resolve, 500));
+
       } catch (err) {
         console.error(`❌ Error fetching product ${baseProduct.id}:`, err);
         fullProducts.push({
@@ -113,7 +117,7 @@ export async function handler() {
       }
     }
 
-    // 3️⃣ Write results to cache file
+    // 3️⃣ Save the cache file
     const dataDir = path.resolve('data');
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
 
@@ -139,6 +143,7 @@ export async function handler() {
         count: fullProducts.length,
         message:
           '✅ Printful cache updated successfully with variant details and prices.',
+        sample: fullProducts[0] || {}
       }),
     };
   } catch (error) {
