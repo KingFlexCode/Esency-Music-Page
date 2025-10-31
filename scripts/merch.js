@@ -124,3 +124,16 @@ document.addEventListener('DOMContentLoaded', () => {
   loadProducts();
   setupFilters();
 });
+
+// inside renderProducts()
+let variantHTML = '';
+if (item.variants && item.variants.length) {
+  variantHTML = `
+    <select class="variant-select">
+      ${item.variants.map(v =>
+        `<option value="${v.id}" data-price="${v.price}">
+           ${v.size || v.name || 'Option'}
+         </option>`).join('')}
+    </select>`;
+}
+

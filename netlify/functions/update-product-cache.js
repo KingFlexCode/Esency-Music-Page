@@ -4,12 +4,13 @@ import path from 'path';
 
 export async function handler() {
   const API_KEY = process.env.PRINTFUL_API_KEY;
+
   if (!API_KEY) {
     return {
       statusCode: 500,
       body: JSON.stringify({
         success: false,
-        error: 'Missing PRINTFUL_API_KEY'
+        error: 'Missing PRINTFUL_API_KEY in environment variables.'
       }),
     };
   }
@@ -19,35 +20,52 @@ export async function handler() {
   const limit = 20;
 
   try {
-    // Pull all products in pages
+    console.log('🔄 Fetching all Printful products...');
+
+    // 1️⃣ Fetch all base products (paged)
     while (true) {
-      const res = await fetch(
+      const response = await fetch(
         `https://api.printful.com/store/products?page=${page}&limit=${limit}`,
         { headers: { Authorization: `Bearer ${API_KEY}` } }
       );
-      if (!res.ok) break;
-      const data = await res.json();
+
+      if (!response.ok) {
+        console.error(`❌ Failed to fetch products on page ${page}`);
+        break;
+      }
+
+      const data = await response.json();
       if (!data.result?.length) break;
 
       allProducts.push(...data.result);
+      console.log(`✅ Fetched page ${page}, total so far: ${allProducts.length}`);
+
+      // Stop if no more pages
       if (data.paging && page >= data.paging.total_pages) break;
       page++;
-      // Respect the Printful API’s rate limits
-      await new Promise((r) => setTimeout(r, 1000));
+
+      // Respect API rate limits (avoid 429)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    // For each product, fetch full variant data (size, color, price, etc.)
+    console.log(`📦 Total products fetched: ${allProducts.length}`);
+
+    // 2️⃣ For each product, fetch full details with variants
     const fullProducts = [];
-    for (const baseProd of allProducts) {
+
+    for (const baseProduct of allProducts) {
       try {
         const detailRes = await fetch(
-          `https://api.printful.com/store/products/${baseProd.id}`,
+          `https://api.printful.com/store/products/${baseProduct.id}`,
           { headers: { Authorization: `Bearer ${API_KEY}` } }
         );
+
         const detailData = await detailRes.json();
+
         if (detailRes.ok && detailData.result) {
           const detail = detailData.result;
-          // Extract variants: id, size, color, price
+
+          // Extract all variant info
           const variants = Array.isArray(detail.variants)
             ? detail.variants.map((v) => ({
                 id: v.id,
@@ -55,52 +73,64 @@ export async function handler() {
                 size: v.size || '',
                 color: v.color || '',
                 price: v.retail_price || '',
+                currency: v.currency || 'USD',
               }))
             : [];
 
-          const defaultPrice =
-            variants.length > 0 ? variants[0].price : '';
+          // Use first variant price as default
+          const defaultPrice = variants.length > 0 ? variants[0].price : '';
 
           fullProducts.push({
-            id: baseProd.id,
-            name: detail.product?.name || baseProd.name,
+            id: baseProduct.id,
+            name: detail.product?.name || baseProduct.name,
             thumbnail_url:
-              detail.product?.thumbnail_url || baseProd.thumbnail_url,
+              detail.product?.thumbnail_url || baseProduct.thumbnail_url,
             variants,
             default_price: defaultPrice,
           });
+
+          console.log(`✅ Cached ${baseProduct.name} (${variants.length} variants)`);
         } else {
-          // Fallback if detail call fails
+          // Fallback minimal info if variant fetch fails
           fullProducts.push({
-            id: baseProd.id,
-            name: baseProd.name,
-            thumbnail_url: baseProd.thumbnail_url,
+            id: baseProduct.id,
+            name: baseProduct.name,
+            thumbnail_url: baseProduct.thumbnail_url,
             variants: [],
             default_price: '',
           });
+          console.warn(`⚠️ Could not fetch details for ${baseProduct.name}`);
         }
       } catch (err) {
+        console.error(`❌ Error fetching product ${baseProduct.id}:`, err);
         fullProducts.push({
-          id: baseProd.id,
-          name: baseProd.name,
-          thumbnail_url: baseProd.thumbnail_url,
+          id: baseProduct.id,
+          name: baseProduct.name,
+          thumbnail_url: baseProduct.thumbnail_url,
           variants: [],
           default_price: '',
         });
       }
     }
 
-    // Save the enriched product list to your cache file
+    // 3️⃣ Write results to cache file
     const dataDir = path.resolve('data');
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
+
+    const cacheFile = path.join(dataDir, 'printful-cache.json');
     fs.writeFileSync(
-      path.join(dataDir, 'printful-cache.json'),
+      cacheFile,
       JSON.stringify(
-        { updated: Date.now(), products: fullProducts },
+        {
+          updated: new Date().toISOString(),
+          products: fullProducts,
+        },
         null,
         2
       )
     );
+
+    console.log(`✅ Cache file written to ${cacheFile}`);
 
     return {
       statusCode: 200,
@@ -108,14 +138,17 @@ export async function handler() {
         success: true,
         count: fullProducts.length,
         message:
-          '✅ Printful cache updated successfully with variants',
+          '✅ Printful cache updated successfully with variant details and prices.',
       }),
     };
-  } catch (err) {
-    console.error('❌ Cache update failed:', err);
+  } catch (error) {
+    console.error('❌ Cache update failed:', error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ success: false, error: err.message }),
+      body: JSON.stringify({
+        success: false,
+        error: error.message,
+      }),
     };
   }
 }
