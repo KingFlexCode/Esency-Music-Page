@@ -25,7 +25,7 @@ function renderProducts(products) {
   products.forEach((item) => {
     const name = item.name || 'Item';
     const variants = item.variants || [];
-    // Use default_price or first variant’s price
+    // Use default_price or the first variant’s price
     let price = parseFloat(
       item.default_price || (variants[0]?.price ?? 0)
     ).toFixed(2);
@@ -34,7 +34,7 @@ function renderProducts(products) {
     const card = document.createElement('div');
     card.className = 'product-card';
 
-    // Build variant select dropdown if variants exist
+    // Build variant dropdown if there are variants
     let variantSelectHTML = '';
     if (variants.length > 0) {
       const options = variants
@@ -82,7 +82,7 @@ function renderProducts(products) {
 
       addToCart({
         id: variantId,
-        productId: item.id,    // parent product ID for reference
+        productId: item.id,    // store the base product ID if needed
         name: name,
         price: priceVal,
         size: sizeVal,
@@ -104,7 +104,8 @@ function showToast(msg) {
 function setupFilters() {
   document.querySelectorAll('.filter-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      document.querySelectorAll('.filter-btn').forEach((b) => b.classList.remove('active'));
+      document.querySelectorAll('.filter-btn')
+        .forEach((b) => b.classList.remove('active'));
       btn.classList.add('active');
       const category = btn.dataset.category;
       const filtered =

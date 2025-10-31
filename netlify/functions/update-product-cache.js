@@ -19,13 +19,12 @@ export async function handler() {
   const limit = 20;
 
   try {
-    // 1. Fetch all products in pages
+    // Pull all products in pages
     while (true) {
       const res = await fetch(
         `https://api.printful.com/store/products?page=${page}&limit=${limit}`,
         { headers: { Authorization: `Bearer ${API_KEY}` } }
       );
-
       if (!res.ok) break;
       const data = await res.json();
       if (!data.result?.length) break;
@@ -33,11 +32,11 @@ export async function handler() {
       allProducts.push(...data.result);
       if (data.paging && page >= data.paging.total_pages) break;
       page++;
-      // Respect Printful’s rate limit (pause 1s per page)
+      // Respect the Printful API’s rate limits
       await new Promise((r) => setTimeout(r, 1000));
     }
 
-    // 2. For each product, get its variants and prices
+    // For each product, fetch full variant data (size, color, price, etc.)
     const fullProducts = [];
     for (const baseProd of allProducts) {
       try {
@@ -48,8 +47,7 @@ export async function handler() {
         const detailData = await detailRes.json();
         if (detailRes.ok && detailData.result) {
           const detail = detailData.result;
-
-          // Build variant list with size, colour and price
+          // Extract variants: id, size, color, price
           const variants = Array.isArray(detail.variants)
             ? detail.variants.map((v) => ({
                 id: v.id,
@@ -72,7 +70,7 @@ export async function handler() {
             default_price: defaultPrice,
           });
         } else {
-          // Fallback if detail call fails: include minimal info
+          // Fallback if detail call fails
           fullProducts.push({
             id: baseProd.id,
             name: baseProd.name,
@@ -81,7 +79,7 @@ export async function handler() {
             default_price: '',
           });
         }
-      } catch (innerErr) {
+      } catch (err) {
         fullProducts.push({
           id: baseProd.id,
           name: baseProd.name,
@@ -92,7 +90,7 @@ export async function handler() {
       }
     }
 
-    // 3. Save to local JSON cache
+    // Save the enriched product list to your cache file
     const dataDir = path.resolve('data');
     if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir);
     fs.writeFileSync(
@@ -117,10 +115,7 @@ export async function handler() {
     console.error('❌ Cache update failed:', err);
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        success: false,
-        error: err.message,
-      }),
+      body: JSON.stringify({ success: false, error: err.message }),
     };
   }
 }
