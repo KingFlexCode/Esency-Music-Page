@@ -108,7 +108,7 @@ main {
   display: block;
   width: 100%;
   aspect-ratio: 16/9;
-  object-fit: cover;
+  object-fit:cover;
   background: #111;
   border-bottom: 1px solid var(--line);
 }
@@ -253,4 +253,9 @@ main {
     padding: 6px;
     border-radius: 12px;
   }
+}
+/* Adjust only Francina's blog thumbnail */
+.post-card[data-id="francina-feature"] .thumb {
+  object-fit: cover;
+  object-position: top center; /* focuses more on the top of the image */
 }

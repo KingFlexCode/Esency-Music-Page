@@ -6,6 +6,90 @@
 /* ===== 1) Shared posts data (keep synced with blog-main.js) ===== */
 const posts = [
   {
+    id: "francina-feature",
+    title: 'Francina: "La Nena de RD" An Anthem of Empowerment, Culture & Celebration',
+    date: "2025-11-14",
+    tags: ["Francina", "Dominican Artist", "Women in Music", "Feature"],
+    excerpt: "Dominican-born artist Francina blends her Caribbean roots with global sounds in her empowering new single 'La Nena de RD'.",
+    cover: "../assets/images/blog-images/francina-yellow-backdrop.png",
+    content: `
+      <section>
+        <h2>Francina new song "La Nena de RD" Empowering Women Through Music</h2>
+        <p>Born between the vibrant streets of the Dominican Republic and the metropolitan rhythm of New York, <strong>Francina</strong> stands at the crossroads of Caribbean heritage and international ambition. With her upcoming single <em>“La Nena de RD”</em>, she channels that dual identity into a bold, celebratory anthem dedicated to women — especially Dominican women — while inviting listeners everywhere to feel powerful, proud, and unstoppable.</p>
+
+        <h3>Roots and Sound</h3>
+        <p>Francina’s sound is born of fusion: the Merengue and Bachata echoes of her upbringing in the DR meet R&B, pop, and global rhythms she absorbed growing up in New York. She explains:</p>
+        <blockquote>“It’s really like a fusion of Dominican artists and international artists I’ve listened to all my life.”</blockquote>
+        <p>This blending of worlds gives her music a fresh edge. She doesn’t just sing — she tells stories of identity, femininity, and resilience through melody and groove.</p>
+
+        <h3>About the Single — “La Nena de RD”</h3>
+        <p>Produced by <strong>Zcottie</strong>, <em>“La Nena de RD”</em> is a high-energy track designed to empower. Francina shares:</p>
+        <blockquote>“The next song is called ‘La Nena de RD’, produced by Zcottie. It’s dedicated to women — especially Dominican women — but really for all women to have fun, feel good, and feel like a mamacita.”</blockquote>
+        <p>With its driving reggaetón heartbeat, playful brass accents, and confident vocals, the track is less about a love story and more about liberation: dancing for yourself, owning your story, and celebrating who you are.</p>
+
+        <h3>The Creative Process</h3>
+        <p>Francina and Zcottie’s chemistry in the studio brings out the best of both worlds — rhythmic energy and emotional storytelling. “Usually, when we have the beat, we create melodies first, then the lyrics, and we build the song piece by piece,” she says. The result is an intuitive, organic track that flows effortlessly from inspiration to execution.</p>
+
+        <h3>From Challenges to Triumph</h3>
+        <p>As a female artist navigating an ever-changing industry, Francina stays true to herself:</p>
+        <blockquote>“When I want to do a genre that might not be popular, people say it won’t work. I just don’t listen to that.”</blockquote>
+        <p>Her defiant creativity and independence define her artistry. For Francina, authenticity isn’t optional — it’s her brand.</p>
+        <img src="../assets/images/blog-images/francina-head-shot.jpg" style="width:500px;height:500px;object-fit:cover;">
+        <h3>Engaging the Fanbase</h3>
+        <p>Francina leverages social media as a creative diary. “If the song has an emotion that resonates, I share that,” she says. Through performance clips and studio snippets, she brings fans closer to her artistic process — giving them a front-row seat to her evolution.</p>
+
+        <h3>Looking Ahead</h3>
+        <p>Francina’s sights are set on expanding her reach: Mexico, Chile, Argentina, Spain, and the United States are all in her touring plans. Her goal is to share her energy, her message, and her roots with audiences everywhere.</p>
+
+        <h3>The Takeaway</h3>
+        <p><em>“La Nena de RD”</em> is more than a single — it’s a celebration of culture and confidence. Francina’s message is clear: be bold, be proud, and keep creating. She’s not just representing Dominican women — she’s redefining what empowerment sounds like.</p>
+        <p>Follow <a href="https://www.instagram.com/francinamusic/" target="_blank">@francinamusic</a> for updates on her releases and tour dates.</p>
+      </section>
+    `
+  },
+
+  {
+    id: "zcottie-feature",
+    title: "Zcottie: Engineering Sound and Soul in an AI-Driven Age",
+    date: "2025-11-07",
+    tags: ["Zcottie", "Music Producer", "AI in Music", "Feature"],
+    excerpt: "Producer Zcottie opens up about his creative process, collaboration with Francina, and how AI is shaping the future of music production.",
+    cover: "../assets/images/blog-images/scottie-studio.png",
+    content: `
+      <section>
+        <h2>Zcottie: Engineering Sound and Soul in an AI-Driven Age</h2>
+        <p>In a studio in New York, wires hum, monitors glow, and beats come alive. At the helm sits <strong>Zcottie</strong> — a producer and engineer who merges raw emotion with cutting-edge innovation. His recent collaborations with artists like <strong>Francina</strong> have placed him at the forefront of the evolving conversation about creativity and technology in music.</p>
+
+        <h3>Backstory</h3>
+        <p>For Zcottie, music started as a form of curiosity. “I actually started in Texas,” he recalls. “My dad gave me this old computer with some audio software. No internet, no games — just sound.” That constraint became his creative freedom. With no distractions, he taught himself recording, arrangement, and mixing — skills that would define his approach to sound today.</p>
+
+        <h3>Collaboration Philosophy</h3>
+        <p>When working with artists, Zcottie’s philosophy is simple: vibe first, rules later. “A lot of times artists come in with an idea; other times, it’s just vibing and seeing what happens,” he says. “The magic happens when no one’s trying too hard — when everyone’s just feeling the moment.”</p>
+
+        <h3>Workflow and Method</h3>
+        <p>Each project for Zcottie begins differently. “Sometimes it’s a sound I hear on a keyboard. Sometimes it’s a random drum loop,” he says. “The spark can come from anywhere — a texture, a voice, or even silence.” From that spark, he layers percussion, melody, and space to build fully realized soundscapes that balance structure and spontaneity.</p>
+
+        <h3>AI: The Tool, Not the Replacement</h3>
+        <p>In an era dominated by artificial intelligence, Zcottie remains grounded. “AI lowered the barrier to start making music,” he admits, “but it’s still just another tool. It can’t replace learning your craft.” He experiments with platforms like Suno and generative plugins but sees them as inspiration — not substitutes for skill.</p>
+
+        <blockquote>“Technology gives us more colors to paint with, but the soul of the music still comes from the human behind the screen.”</blockquote>
+
+        <h3>A Global Sound</h3>
+        <p>Zcottie’s sessions often feature collaborators from around the world — brass sections recorded in Colombia, guitars from Brazil, and vocals tracked in New York. His attention to detail and willingness to bridge cultures create a sound both authentic and borderless.</p>
+
+        <h3>Advice for Emerging Producers</h3>
+        <p>“Keep creating. The more you experiment, the sharper your ears get,” he advises. “Don’t box yourself in by genre — explore old music, listen globally, and study emotion. Every sound teaches you something.”</p>
+
+        <h3>What’s Next</h3>
+        <p>Following the release of <em>“La Nena de RD”</em>, Zcottie is working on a new merengue track and exploring fusions that blend Latin rhythm with modern electronic textures. “We’re experimenting a lot,” he says. “It’s about keeping things fresh but rooted in who we are.”</p>
+
+        <h3>Conclusion</h3>
+        <p>In an age when automation threatens authenticity, Zcottie reminds us of the heart that drives every track. His sound is human, soulful, and evolving — proof that in music, technology is only as powerful as the hands that shape it.</p>
+        <p>Follow <a href="https://www.instagram.com/iamzcottie/" target="_blank">@iamzcottie</a> for studio updates and behind-the-scenes moments.</p>
+      </section>
+    `
+  },
+  {
     id: "the-power-of-writing-and-producing-your-own-music",
     title: "The Power of Writing and Producing Your Own Music",
     date: "2025-09-01",

@@ -10,6 +10,24 @@
 /* ===== 1) POSTS DATA (add/remove freely) ===== */
 const posts = [
   {
+    id: "francina-feature",
+    title: 'Francina: "La Nena de RD" An Anthem of Empowerment, Culture & Celebration',
+    date: "2025-11-14",
+    tags: ["Francina", "Dominican Artist", "Women in Music", "Feature"],
+    excerpt: "Dominican born artist Francina fuses Caribbean rhythm and global sounds in her empowering new single 'La Nena de RD'.",
+    cover: "../assets/images/blog-images/francina-yellow-backdrop.png",
+    url: "../posts/francina-feature.html"
+  },
+  {
+    id: "zcottie-feature",
+    title: "Zcottie: Engineering Sound and Soul in the Age of AI",
+    date: "2025-11-07",
+    tags: ["Zcottie", "Music Producer", "AI in Music", "Feature"],
+    excerpt: "Producer Zcottie opens up about his creative journey, AI in music, and keeping the human touch alive in sound.",
+    cover: "../assets/images/blog-images/scottie-studio.png",
+    url: "../posts/zcottie-feature.html"
+  },
+  {
     id: "the-power-of-writing-and-producing-your-own-music",
     title: "The Power of Writing and Producing Your Own Music",
     date: "2025-09-01",
@@ -103,7 +121,7 @@ function renderArchive(groups) {
       const li = document.createElement("li");
       const a = document.createElement("a");
       a.textContent = p.title;
-      a.href = `#${key}`; // clicking filters main list to this month
+      a.href = `#${key}`;
       li.appendChild(a);
       ul.appendChild(li);
     });
@@ -169,6 +187,10 @@ function renderPosts(groups, monthFilter = null, term = null) {
     ? [...groups.get(monthFilter)]
     : Array.from(groups.values()).flat();
 
+  // hide posts with future dates
+  const today = new Date().toISOString().split("T")[0];
+  list = list.filter(p => p.date <= today);
+
   // month pill
   if (monthFilter && groups.has(monthFilter)) {
     const pill = document.createElement("div");
@@ -212,7 +234,12 @@ function renderPosts(groups, monthFilter = null, term = null) {
 }
 
 /* ===== 6) CONTROLLERS (hash + search) ===== */
-const groups = groupByMonth(posts);
+
+// Filter out future posts before grouping (applies to archive + main)
+const today = new Date().toISOString().split("T")[0];
+const visiblePosts = posts.filter(p => p.date <= today);
+
+const groups = groupByMonth(visiblePosts);
 renderArchive(groups);
 
 function route() {

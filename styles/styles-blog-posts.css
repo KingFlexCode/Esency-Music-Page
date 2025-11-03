@@ -18,6 +18,7 @@
   margin-inline: auto;
 }
 
+
 /* ----- Meta & Header ----- */
 .meta {
   padding: 16px 16px 0;
@@ -68,6 +69,7 @@
   height: auto;
   aspect-ratio: 16/9;
   object-fit: cover;
+  object-position: top center;
   background: #111;
   border-top: 1px solid var(--line);
 }
@@ -93,7 +95,7 @@
 .content a {
   color: var(--accent);
 }
-h1, h2 {
+h1, h2, h3 {
   color: var(--accent);
 }
 
