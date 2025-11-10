@@ -2,15 +2,17 @@
   "name": "esency-music-page",
   "version": "1.0.0",
   "type": "module",
+  "description": "A multipage music website for the artist Esency, designed using HTML, CSS, and JavaScript. The project is inspired by modern artist websites, combining bold design and user-friendly navigation to showcase music, videos, bio, merchandise, and contact information.",
+  "main": "index.js",
   "scripts": {
-    "start": "netlify dev"
+    "start": "netlify dev",
+    "generate:tracks": "node scripts/generate-tracks.js",
+    "build": "npm run generate:tracks && netlify build"
   },
   "dependencies": {
     "@netlify/blobs": "^10.3.0",
     "node-fetch": "^3.3.2"
   },
-  "description": "A multipage music website for the artist **Esency**, designed using HTML, CSS, and (eventually) JavaScript. The project is inspired by modern artist websites, combining bold design and user-friendly navigation to showcase music, videos, bio, merchandise, and contact information.",
-  "main": "index.js",
   "devDependencies": {
     "music-metadata": "^11.10.0",
     "sharp": "^0.34.5"
