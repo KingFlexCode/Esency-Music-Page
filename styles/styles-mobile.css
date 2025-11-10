@@ -1,0 +1,270 @@
+/* ==========================================================
+   ESENCY RESPONSIVE STYLESHEET (styles-responsive.css)
+   ========================================================== */
+/* ==========================================================
+   LEFT SIDEBAR NAVIGATION (Mobile + Tablet Only)
+   ========================================================== */
+@media (max-width: 1024px) {
+  /* NAV BAR ON LEFT */
+  nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;                  /* full screen height */
+    width: 180px;                   /* sidebar width */
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 60px 20px 20px;
+    gap: 18px;
+    z-index: 999;
+    transition: all 0.3s ease;
+  }
+
+  /* NAV LINKS */
+  nav a {
+    display: block;
+    width: 100%;
+    color: #fff;
+    font-weight: bold;
+    font-size: 16px;
+    text-align: left;
+    text-decoration: none;
+    padding: 6px 0;
+    transition: color 0.3s ease;
+  }
+
+  nav a:hover {
+    color: var(--brand);
+  }
+
+  /* LOGO ABOVE LINKS */
+  .esency-logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 22px;
+    color: var(--brand);
+  }
+
+  /* PAGE CONTENT SHIFTS RIGHT TO IGNORE SIDEBAR */
+  main, section, .page-content {
+    margin-left: 200px;
+    padding: 20px;
+    width: calc(100% - 200px);
+    transition: margin 0.3s ease;
+  }
+
+  /* === MOBILE ADJUSTMENTS (Phones only) === */
+  @media (max-width: 600px) {
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: auto;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 10px 0;
+    }
+
+    main, section, .page-content {
+      margin-left: 0;
+      width: 100%;
+      padding: 15px;
+    }
+
+    .esency-logo {
+      position: static;
+      font-size: 20px;
+      margin-right: 10px;
+    }
+  }
+}
+
+/* ====== MOBILE FIRST (Base adjustments for small devices) ====== */
+
+@media (max-width: 600px) {
+  /* NAV */f
+
+  .nav-header {
+    flex-direction: column;
+  }
+
+  .esency-logo {
+    position: static;
+    margin-bottom: 10px;
+    margin-right:auto;
+  }
+
+  /* SONG COVERS */
+  .songs-cover-grid {
+    grid-template-columns: 1fr;
+    width: 60%;
+    padding: 10px;
+  }
+
+  .song-cover {
+    width: 70%;
+    margin: 0 auto;
+  }
+
+  /* EMAIL SIGNUP */
+  .email-signup {
+    width: 85%;
+  }
+
+  /* PRODUCT GRID */
+  .product-grid {
+    grid-template-columns: 1fr;
+    padding: 20px;
+  }
+
+  .product-card {
+    width: 90%;
+    margin: 0 auto;
+  }
+}
+
+/* ====== DESKTOP (Large screens) ====== */
+@media (min-width: 1025px) {
+  .songs-cover-grid {
+    grid-template-columns: repeat(3, 1fr);
+    width: 60%;
+  }
+
+  .product-grid {
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 30px;
+  }
+
+  #product-list {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    flex: 0 0 280px;
+    white-space: normal;
+  }
+
+  .email-signup {
+    width: 32%;
+  }
+
+  nav {
+    justify-content: center;
+    gap: 30px;
+  }
+}
+
+/* ==========================================================
+   HAMBURGER MENU STYLING (Mobile / Tablet)
+   ========================================================== */
+@media (max-width: 1024px) {
+
+  /* Hide normal horizontal nav */
+  .nav-bar, .nav-bar-music {
+    position: fixed;
+    top: 0;
+    left: -220px; /* off-screen by default */
+    height: 100vh;
+    width: 200px;
+    background: rgba(0,0,0,0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    padding: 80px 20px;
+    gap: 16px;
+    transition: left 0.3s ease;
+    z-index: 998;
+  }
+
+  /* When opened */
+  .nav-bar.open,.nav-bar-music.open {
+    left: 0;
+  }
+
+  /* Links inside sidebar */
+  .nav-bar a {
+    width: 100%;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    transition: color 0.3s;
+  }
+  .nav-bar a:hover { color: var(--brand); }
+
+  /* BURGER ICON */
+  .burger {
+    position: absolute;
+    right: 20px;
+    top: 25px;
+    width: 22px;
+    height: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 999;
+  }
+
+  .burger span {
+    display: block;
+    height: 3px;
+    width: 100%;
+    background: #fff;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+  }
+
+  /* Animate burger into an X */
+  .burger.active span:nth-child(1) {
+    transform: rotate(45deg) translateY(9px);
+  }
+  .burger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .burger.active span:nth-child(3) {
+    transform: rotate(-45deg) translateY(-9px);
+  }
+
+  /* Shift main content to ignore sidebar when open (optional) */
+  main, section, .page-content {
+    transition: margin-left 0.3s ease;
+  }
+  .nav-bar.open ~ main {
+    margin-left: 200px;
+  }
+}
+
+/* ==========================================================
+   BURGER VISIBILITY RULES
+   ========================================================== */
+
+/* Show burger only on mobile/tablet */
+@media (max-width: 1024px) {
+  .burger {
+    display: flex;
+  }
+}
+
+/* Hide burger on desktop */
+@media (min-width: 1025px) {
+  .burger {
+    display: none;
+  }
+}
+

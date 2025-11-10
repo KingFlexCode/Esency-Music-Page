@@ -4,12 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Esency Music Page</title>
-  <link rel="stylesheet" href="../styles/muisc-styles.css" />
   <link rel="stylesheet" href="../styles/styles.css"/>
+  <link rel="stylesheet" href="../styles/styles-mobile.css" />
+  <link rel="stylesheet" href="../styles/music-styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body class="music-background">
   <header class="nav-header">
     <h1 class="esency-logo"><a href="./home.html">ESENCY</a></h1>
+    
+    <!-- HAMBURGER BUTTON (only visible on mobile) -->
+    <button class="burger" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
     <nav class="nav-bar-music">
       <a href="./home.html">Home</a>
       <a href="./blog.html">Blog</a>
@@ -22,32 +32,38 @@
     </nav>
   </header>
   <main>
-    <div class="page-section">
-      <h2>🚧 Work in Progress</h2>
-      <p>This page is currently under construction. Please check back soon!</p>
-    </div>
-  </main>
   <section class="music-wrap">
-  <h1>Music</h1>
-  <div class="player">
-      <div class="now-playing">
-        <img class="cover-art" src="../assets/covers/default.jpg" alt="Cover" />
-        <div>
-          <h3 id="track-title">Track Title</h3>
-          <div id="track-artist">Artist Name</div>
-          <div class="controls">
-            <button id="prev-btn">Prev</button>
-            <button id="play-btn">Play</button>
-            <button id="next-btn">Next</button>
-          </div>
-          <div class="timeline">
-            <input type="range" id="progress-bar" min="0" max="100" step="1" value="0" />
-          </div>
+    <div class="playlist-header">
+      <div class="playlist-cover">
+        <img src="../assets/covers/default.jpg" alt="Playlist Cover" class="cover-img" />
+      </div>
+      <div class="playlist-info">
+        <p>Playlist</p>
+        <h1>Liked Songs</h1>
+        <div class="playlist-meta">
+          <img src="../assets/images/esency-profile.jpg" alt="Esency" class="artist-avatar" />
+          <span>Esency • <span id="song-count">3 songs</span></span>
         </div>
       </div>
     </div>
-    <ul class="playlist" id="playlist"></ul>
+
+    <div class="player-controls">
+      <button id="play-btn"><i class="fa-solid fa-play"></i></button>
+      <button id="shuffle-btn"><i class="fa-solid fa-shuffle"></i></button>
+      <button id="download-btn"><i class="fa-solid fa-download"></i></button>
+    </div>
+
+    <div class="genre-tags">
+      <button class="tag">Reggaeton</button>
+      <button class="tag">Dancehall</button>
+      <button class="tag">Latin</button>
+      <button class="tag">Chill</button>
+    </div>
+
+    <ul id="playlist" class="playlist-table"></ul>
   </section>
   <script type="module" src="../scripts/music-player.js"></script>
+  <script src="../scripts/nav-toggle.js"></script>
+
 </body>
 </html>

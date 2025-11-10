@@ -119,23 +119,6 @@ select {
   gap: 1.5rem;
   justify-items: center;
 }
-
-/* Large screens: one-line horizontal scroll */
-@media (min-width: 1200px) {
-  #product-list {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    gap: 1.5rem;
-  }
-
-  .product-card {
-    flex: 0 0 280px;
-    white-space: normal;
-  }
-}
-
 /* Variant dropdown styling */
 .product-card select.variant-select {
   margin-top: 8px;

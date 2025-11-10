@@ -5,10 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Esency Contact Page</title>
   <link rel="stylesheet" href="../styles/styles.css">
+  <link rel="stylesheet" href="../styles/styles-mobile.css" />
 </head>
 <body class="contact-background">
   <header class="nav-header">
     <h1 class="esency-logo"><a href="./home.html">ESENCY</a></h1>
+
+    <!-- HAMBURGER BUTTON (only visible on mobile) -->
+    <button class="burger" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
     <nav class="nav-bar">
       <a href="./home.html">Home</a>
       <a href="./blog.html">Blog</a>
@@ -70,8 +79,11 @@
       </form>
     </div>
 </main>
+  
   <footer>
     <p>&copy; 2025 Esency. All rights reserved.</p>
   </footer>
+
+  <script src="../scripts/nav-toggle.js"></script>
 </body>
 </html>

@@ -6,6 +6,7 @@
   <title>Your Cart - Esency</title>
   <link rel="stylesheet" href="../styles/styles.css">
   <link rel="stylesheet" href="../styles/styles-cart.css">
+  <link rel="stylesheet" href="../styles/styles-mobile.css" />
   <style>
     .cart-wrap {max-width: 960px; margin: 40px auto; padding: 0 16px;}
     .cart-table {width: 100%; border-collapse: collapse; margin-bottom: 16px;}
@@ -20,6 +21,14 @@
 <body>
   <header class="nav-header">
     <h1 class="esency-logo"><a href="./home.html">ESENCY</a></h1>
+
+    <!-- HAMBURGER BUTTON (only visible on mobile) -->
+    <button class="burger" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    
     <nav class="nav-bar">
       <a href="./home.html">Home</a>
       <a href="./blog.html">Blog</a>
@@ -71,6 +80,8 @@
   <footer>
     <p>&copy; 2025 Esency. All rights reserved.</p>
   </footer>
+
+  <script src="../scripts/nav-toggle.js"></script>
 
   <!-- PayPal JS SDK (use SANDBOX while testing; switch to Live when ready) -->
   <script src="https://www.paypal.com/sdk/js?client-id=AQH2Ku3FflhcXZiE93-33wunMJIZERUtZfRvKGN8TGpo4MsGXTs4X7mmBI3zqoBrBf5PAQnrMCEuDgZY&currency=USD"></script>

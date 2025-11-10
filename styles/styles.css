@@ -349,22 +349,6 @@ footer {
 }
 .copy-toast.show { opacity: 1; transform: translateY(0); }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 900px) {
-  .songs-cover-grid {
-    grid-template-columns: repeat(2, 1fr);
-    width: 90%;
-  }
-  .email-signup { width: 80%; }
-}
-
-@media (max-width: 600px) {
-  .songs-cover-grid {
-    grid-template-columns: 1fr;
-    width: 90%;
-  }
-}
-
 .product-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -453,4 +437,11 @@ footer {
 .filter-btn:hover {
   background: #f76b0a;
   color: #111;
+}
+
+.filter-container {
+  display:flex;
+  flex-direction: row;
+  justify-content: center;
+  margin-top:20px;
 }
