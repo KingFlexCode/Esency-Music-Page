@@ -11,31 +11,32 @@
   <div class="wrap">
     <header>
       <a class="back" href="../pages/blog.html">← Back to Blog</a>
-      <div class="logo">ESENCY • BLOG</div>
+      <div class="logo"><a href="../pages/home.html">ESENCY</a> • BLOG</div>
     </header>
 
-    <article class="post" id="post">
-      <div class="meta">
-        <h1 class="title" id="post-title">Loading…</h1>
-        <div class="stats">
-          <span class="stat" title="Published">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="9" stroke="#b7b7b7" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#b7b7b7" stroke-width="2" stroke-linecap="round"/></svg>
-            <span id="post-date"></span>
-          </span>
-          <span class="dot"></span>
-          <span class="stat" title="Reading time">⏱ <span id="read-time">—</span></span>
-          <span class="dot"></span>
-          <span class="stat" title="Views">👁️ <span id="views">0</span></span>
-        </div>
-        <div class="tags" id="post-tags"></div>
+  <article class="post" id="post">
+    <div class="meta">
+      <h1 class="title" id="post-title">Loading…</h1>
+      <div class="stats">
+        <span class="stat" title="Published">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="12" cy="12" r="9" stroke="#b7b7b7" stroke-width="2"/>
+            <path d="M12 7v5l3 3" stroke="#b7b7b7" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <span id="post-date"></span>
+        </span>
+        <span class="dot"></span>
+        <span class="stat" title="Reading time">⏱ <span id="read-time">—</span></span>
+        <span class="dot"></span>
+        <span class="stat" title="Views">👁️ <span id="views">0</span></span>
       </div>
+      <div class="tags" id="post-tags"></div>
+    </div>
 
-      <img class="cover" id="post-cover" alt="Post cover" src="" />
+    <img class="cover" id="post-cover" alt="Post cover" />
+    <div class="content" id="post-content"></div>
+  </article>
 
-      <div class="content" id="post-content">
-        <!-- Fallback content if no fetchContent is provided -->
-      </div>
-    </article>
 
     <section class="nav">
       <a id="prevLink" href="#"><small>← Previous</small><div id="prevTitle">—</div></a>
@@ -46,7 +47,107 @@
       © <span id="year"></span> Esency Music Records.
     </footer>
   </div>
+
   <script src="../scripts/posts-data.js"></script>
+  <script>
+    // Simple local view counter (per visitor)
+    const viewStore = {
+      key: 'esency_blog_views',
+      load(){ try { return JSON.parse(localStorage.getItem(this.key) || '{}'); } catch { return {}; } },
+      save(obj){ localStorage.setItem(this.key, JSON.stringify(obj)); },
+      inc(id){ const s=this.load(); s[id]=(s[id]||0)+1; this.save(s); return s[id]; },
+      get(id){ const s=this.load(); return s[id]||0; }
+    };
+
+    function estimateReadTime(html){
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      const text = tmp.textContent || tmp.innerText || '';
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+      const mins = Math.max(1, Math.round(words / 200));
+      return `${mins} min`;
+    }
+
+    function monthLabel(dateStr){
+      const d = new Date(dateStr + 'T12:00:00');
+      return d.toLocaleDateString(undefined, { year:'numeric', month:'short', day:'numeric' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('year').textContent = new Date().getFullYear();
+
+      // 1) get id from ?id=... OR from filename (/pages/posts/slide-by-esency.html → "slide-by-esency")
+      const params = new URLSearchParams(location.search);
+      let id = params.get('id');
+      if(!id){
+        const m = location.pathname.match(/\/posts\/([^\/]+)\.html$/);
+        if(m) id = m[1];
+      }
+
+      // 2) find the post in the global `posts` array (from posts-data.js)
+      if(!window.posts || !Array.isArray(window.posts)){
+        console.error('posts-data.js not loaded or posts is not an array.');
+        document.getElementById('post-content').textContent = 'Error loading post data.';
+        return;
+      }
+      const post = window.posts.find(p => p.id === id);
+
+      if(!post){
+        // No silent fallback — show a helpful message
+        document.getElementById('post').innerHTML = `
+          <div class="content" style="padding:16px">
+            <h1>Post not found</h1>
+            <p>We couldn’t find a post with id <code>${id ?? '(none)'}</code>.</p>
+            <h3>Recent posts</h3>
+            <ul>
+              ${window.posts.slice(0,5).map(p => `<li><a href="./${p.id}.html">${p.title}</a></li>`).join('')}
+            </ul>
+          </div>`;
+        return;
+      }
+
+      // 3) fill the UI
+      document.getElementById('post-title').textContent = post.title;
+      document.getElementById('post-date').textContent  = monthLabel(post.date);
+      document.getElementById('post-cover').src         = post.cover;
+      document.getElementById('post-cover').alt         = post.title;
+
+      const contentHTML = post.content || `<p>${post.excerpt||''}</p>`;
+      document.getElementById('post-content').innerHTML = contentHTML;
+      document.getElementById('read-time').textContent  = estimateReadTime(contentHTML);
+
+      // 4) tags
+      const tagsMount = document.getElementById('post-tags');
+      tagsMount.innerHTML = (post.tags||[]).map(t => `<span class="tag">#${t}</span>`).join('');
+
+      // 5) views (increment on open)
+      const v = viewStore.inc(post.id);
+      document.getElementById('views').textContent = v;
+
+      // 6) prev/next (link to sibling files in the same folder)
+      const idx = window.posts.findIndex(p => p.id === post.id);
+      const prev = window.posts[idx - 1];
+      const next = window.posts[idx + 1];
+
+      const prevLink = document.getElementById('prevLink');
+      const nextLink = document.getElementById('nextLink');
+
+      if(prev){
+        prevLink.href = `./${prev.id}.html`;
+        document.getElementById('prevTitle').textContent = prev.title;
+      } else {
+        prevLink.style.display = 'none';
+      }
+
+      if(next){
+        nextLink.href = `./${next.id}.html`;
+        document.getElementById('nextTitle').textContent = next.title;
+      } else {
+        nextLink.style.display = 'none';
+      }
+    });
+  </script>
+  
   <script src="../scripts/share.js"></script>
 </body>
 </html>
