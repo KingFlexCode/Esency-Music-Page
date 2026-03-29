@@ -4,6 +4,11 @@ A multipage music website for the artist **Esency**, designed using HTML, CSS, a
 
 ---
 
+You can view the live, publicly hosted version of this project at:
+https://esencymusic.com
+
+---
+
 ## 🎯 Project Goals
 
 * Build a clean, bold, and responsive artist website
