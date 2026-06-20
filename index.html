@@ -1,17 +1,483 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Welcome to Esency</title>
-  <link rel="stylesheet" href="./styles/styles.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Esency — The Studio</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0a0a;overflow:hidden;height:100vh;font-family:'Helvetica Neue',sans-serif;color:#fff}
+#canvas-wrap{position:relative;width:100vw;height:100vh}
+canvas{display:block}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 2.5rem;background:linear-gradient(to bottom,rgba(0,0,0,0.75) 0%,transparent 100%)}
+.logo{font-size:1.05rem;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#fff;text-decoration:none}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:rgba(255,255,255,.6);text-decoration:none;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:color .2s}
+.nav-links a:hover{color:#ffcc00}
+
+/* TOOLTIP */
+#tooltip{position:fixed;pointer-events:none;z-index:60;background:rgba(0,0,0,.88);border:0.5px solid rgba(255,204,0,.35);color:#fff;padding:8px 16px;font-size:.65rem;letter-spacing:.18em;text-transform:uppercase;opacity:0;transition:opacity .15s;white-space:nowrap}
+
+/* PANEL */
+.panel{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(10px);opacity:0;pointer-events:none;transition:opacity .32s}
+.panel.open{opacity:1;pointer-events:all}
+.panel-card{background:#0f0f0f;border:0.5px solid rgba(255,255,255,.1);padding:2.8rem 3rem;max-width:520px;width:90%;position:relative}
+.panel-tag{font-size:.6rem;letter-spacing:.28em;text-transform:uppercase;color:#ffcc00;margin-bottom:1rem}
+.panel-title{font-size:1.9rem;font-weight:400;letter-spacing:.04em;margin-bottom:.9rem}
+.panel-body{font-size:.85rem;line-height:1.8;color:rgba(255,255,255,.58);margin-bottom:1.8rem}
+.panel-cta{display:inline-block;padding:.8rem 1.8rem;border:1px solid rgba(255,255,255,.28);color:#fff;text-decoration:none;font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;margin-right:.8rem;margin-bottom:.5rem;cursor:pointer;background:transparent;font-family:inherit;transition:background .2s,border-color .2s}
+.panel-cta:hover{background:rgba(255,204,0,.12);border-color:#ffcc00;color:#ffcc00}
+.panel-close{position:absolute;top:1.4rem;right:1.4rem;background:none;border:none;color:rgba(255,255,255,.4);font-size:1.3rem;cursor:pointer;transition:color .2s;line-height:1}
+.panel-close:hover{color:#fff}
+
+/* ROOM LABEL */
+.room-label{position:fixed;bottom:2.2rem;left:50%;transform:translateX(-50%);font-size:.6rem;letter-spacing:.38em;text-transform:uppercase;color:rgba(255,255,255,.3);pointer-events:none}
+
+/* HINT */
+.hint{position:fixed;bottom:2rem;right:2.5rem;font-size:.58rem;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.25)}
+
+/* LOADING */
+#loading{position:fixed;inset:0;background:#0a0a0a;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;transition:opacity .6s}
+#loading h2{font-size:.8rem;letter-spacing:.35em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:2rem}
+#loading-bar-wrap{width:180px;height:1px;background:rgba(255,255,255,.1)}
+#loading-bar{height:1px;background:#ffcc00;width:0%;transition:width .3s}
+</style>
 </head>
 <body>
-  <section class="intro-screen">
-    <div class="intro-content">
-      <h1>Esency</h1>
-      <p>Feel the vibe. Hear the sound.</p>
-      <a href="./pages/home.html" class="enter-btn">Enter Here</a>
-    </div>
-  </section>
+
+<div id="loading">
+  <h2>Loading Studio</h2>
+  <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+</div>
+
+<nav>
+  <a href="#" class="logo">Esency</a>
+  <ul class="nav-links">
+    <li><a onclick="openPanel('music')">Music</a></li>
+    <li><a onclick="openPanel('about')">About</a></li>
+    <li><a href="pages/merch.html">Merch</a></li>
+    <li><a onclick="openPanel('booking')">Booking</a></li>
+  </ul>
+</nav>
+
+<div id="canvas-wrap"><canvas id="c"></canvas></div>
+<div id="tooltip"></div>
+
+<!-- PANELS -->
+<div class="panel" id="panel-music">
+  <div class="panel-card">
+    <button class="panel-close" onclick="closePanel()">&#x2715;</button>
+    <p class="panel-tag">Discography</p>
+    <h2 class="panel-title">The Music</h2>
+    <p class="panel-body">Every track was recorded and produced right here in this room. Stream the full catalog across all platforms.</p>
+    <a class="panel-cta" href="pages/music.html">Full Catalog</a>
+    <a class="panel-cta" href="https://open.spotify.com/artist/" target="_blank">Spotify</a>
+    <a class="panel-cta" href="https://music.apple.com" target="_blank">Apple Music</a>
+  </div>
+</div>
+<div class="panel" id="panel-about">
+  <div class="panel-card">
+    <button class="panel-close" onclick="closePanel()">&#x2715;</button>
+    <p class="panel-tag">The Artist</p>
+    <h2 class="panel-title">About Esency</h2>
+    <p class="panel-body">Independent artist, songwriter, and producer. Born out of this studio — where every sound, every beat, every song was built from scratch.</p>
+    <a class="panel-cta" href="pages/bio.html">Read Bio</a>
+  </div>
+</div>
+<div class="panel" id="panel-booking">
+  <div class="panel-card">
+    <button class="panel-close" onclick="closePanel()">&#x2715;</button>
+    <p class="panel-tag">Sessions &amp; Collabs</p>
+    <h2 class="panel-title">Book a Session</h2>
+    <p class="panel-body">Want to record here, collab on a track, or license a beat? Reach out and let's build something together.</p>
+    <a class="panel-cta" href="pages/contact.html">Contact</a>
+    <a class="panel-cta" href="https://instagram.com" target="_blank">Instagram</a>
+  </div>
+</div>
+<div class="panel" id="panel-guitar">
+  <div class="panel-card">
+    <button class="panel-close" onclick="closePanel()">&#x2715;</button>
+    <p class="panel-tag">Live Instruments</p>
+    <h2 class="panel-title">The Guitars</h2>
+    <p class="panel-body">Live strings on tracks like "So What" and "Pour Me Water." Every riff recorded in this corner of the room.</p>
+    <a class="panel-cta" href="pages/music.html">Hear Them</a>
+  </div>
+</div>
+<div class="panel" id="panel-mic">
+  <div class="panel-card">
+    <button class="panel-close" onclick="closePanel()">&#x2715;</button>
+    <p class="panel-tag">Recording</p>
+    <h2 class="panel-title">The Booth</h2>
+    <p class="panel-body">Vocals laid in the center of the room, surrounded by acoustic treatment. The KRKs don't lie — what you hear is what you get.</p>
+    <a class="panel-cta" href="pages/music.html">Hear It</a>
+  </div>
+</div>
+
+<div class="room-label">The Studio &mdash; Esency Music</div>
+<div class="hint">Click objects to explore</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── helpers ──────────────────────────────────────────────────────────────────
+function openPanel(id){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));
+  var p=document.getElementById('panel-'+id);
+  if(p)p.classList.add('open');
+}
+function closePanel(){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('open'));}
+document.querySelectorAll('.panel').forEach(function(p){
+  p.addEventListener('click',function(e){if(e.target===this)closePanel();});
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closePanel();});
+
+// ── scene ────────────────────────────────────────────────────────────────────
+var W=window.innerWidth,H=window.innerHeight;
+var renderer=new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setSize(W,H);
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.1;
+
+var scene=new THREE.Scene();
+scene.background=new THREE.Color(0x0a0a0a);
+scene.fog=new THREE.Fog(0x0a0a0a,28,48);
+
+// ISOMETRIC CAMERA
+var aspect=W/H;
+var viewSize=9;
+var camera=new THREE.OrthographicCamera(
+  -viewSize*aspect, viewSize*aspect,
+  viewSize, -viewSize,
+  0.1, 100
+);
+// classic isometric angle
+camera.position.set(12,12,12);
+camera.lookAt(0,0,0);
+
+// ── materials palette ─────────────────────────────────────────────────────────
+var MAT={
+  floor:   new THREE.MeshLambertMaterial({color:0xb8860b, transparent:true, opacity:0.9}), // warm wood
+  rug:     new THREE.MeshLambertMaterial({color:0x555555}),
+  wall:    new THREE.MeshLambertMaterial({color:0x2a2a2a}),
+  ceiling: new THREE.MeshLambertMaterial({color:0x1a1a1a}),
+  foam:    new THREE.MeshLambertMaterial({color:0x1c1c1c}),
+  foam2:   new THREE.MeshLambertMaterial({color:0x111111}),
+  desk:    new THREE.MeshLambertMaterial({color:0x1a1a1a}),
+  deskTop: new THREE.MeshLambertMaterial({color:0x222222}),
+  monitor: new THREE.MeshLambertMaterial({color:0x0a0a0a}),
+  screen:  new THREE.MeshLambertMaterial({color:0xff7700, emissive:0xff5500, emissiveIntensity:0.7}),
+  speaker: new THREE.MeshLambertMaterial({color:0x111111}),
+  speakerCone: new THREE.MeshLambertMaterial({color:0xddcc00, emissive:0xaaaa00, emissiveIntensity:0.4}),
+  chair:   new THREE.MeshLambertMaterial({color:0x1a1a1a}),
+  chairSeat: new THREE.MeshLambertMaterial({color:0x333333}),
+  couch:   new THREE.MeshLambertMaterial({color:0xe8e0d0}),
+  couchPillow: new THREE.MeshLambertMaterial({color:0xcccccc}),
+  mic:     new THREE.MeshLambertMaterial({color:0x888888, metalness:0.8}),
+  micStand:new THREE.MeshLambertMaterial({color:0x444444}),
+  guitar:  new THREE.MeshLambertMaterial({color:0x8B4513}),
+  guitarBody: new THREE.MeshLambertMaterial({color:0xa0522d}),
+  lamp:    new THREE.MeshLambertMaterial({color:0xdddddd}),
+  lampLight: new THREE.MeshLambertMaterial({color:0xffcc66, emissive:0xffaa33, emissiveIntensity:1.2}),
+  curtain: new THREE.MeshLambertMaterial({color:0x666666}),
+  poster:  new THREE.MeshLambertMaterial({color:0xffcc00, emissive:0xffcc00, emissiveIntensity:0.15}),
+  kb:      new THREE.MeshLambertMaterial({color:0x111111}),
+  kbKey:   new THREE.MeshLambertMaterial({color:0xffffff}),
+  rack:    new THREE.MeshLambertMaterial({color:0x181818}),
+};
+
+function box(w,h,d,mat,x,y,z,rx,ry,rz){
+  var g=new THREE.BoxGeometry(w,h,d);
+  var m=new THREE.Mesh(g,mat);
+  m.position.set(x,y,z);
+  if(rx)m.rotation.x=rx;
+  if(ry)m.rotation.y=ry;
+  if(rz)m.rotation.z=rz;
+  m.castShadow=true;
+  m.receiveShadow=true;
+  scene.add(m);
+  return m;
+}
+function cyl(rt,rb,h,seg,mat,x,y,z){
+  var g=new THREE.CylinderGeometry(rt,rb,h,seg);
+  var m=new THREE.Mesh(g,mat);
+  m.position.set(x,y,z);
+  m.castShadow=true;
+  scene.add(m);
+  return m;
+}
+
+// ── ROOM SHELL ───────────────────────────────────────────────────────────────
+// Floor (warm hardwood)
+var floor=box(14,0.15,10,MAT.floor,0,-0.075,0);
+
+// Rug (center)
+box(6,0.05,5,MAT.rug,1,0.02,0.5);
+
+// Back wall (Z = -5)
+box(14,6,0.15,MAT.wall,0,3,-5);
+// Left wall (X = -7)
+box(0.15,6,10,MAT.wall,-7,3,0);
+// Right wall
+box(0.15,6,10,MAT.wall,7,3,0);
+// Ceiling
+box(14,0.15,10,MAT.ceiling,0,6,0);
+
+// Ceiling acoustic panel (big dark slab on ceiling)
+box(6,0.2,4,MAT.foam2,2,5.85,-1);
+
+// ── ACOUSTIC FOAM on walls ───────────────────────────────────────────────────
+// Back wall panels (4 vertical panels)
+for(var i=0;i<4;i++){
+  box(1.2,2.5,0.12,MAT.foam,-3.5+i*2.2,2.5,-4.88);
+}
+// Right wall panels
+for(var i=0;i<3;i++){
+  box(0.12,2.2,1.4,MAT.foam,6.88,2.5,-2+i*2.2);
+}
+// Left wall top panels
+box(0.12,1.8,3.5,MAT.foam,-6.88,4.5,0);
+
+// ── CURTAINS (back center) ───────────────────────────────────────────────────
+box(3.5,3.5,0.08,MAT.curtain,-1,3.2,-4.88);
+box(2,3.5,0.08,MAT.curtain,2.2,3.2,-4.88);
+
+// ── STUDIO DESK + MONITOR SETUP (right side) ────────────────────────────────
+// Desk surface
+var desk=box(3.8,0.1,1.8,MAT.deskTop,3.5,1.5,0.2);
+desk.userData={panelId:'music',label:'DAW & Music'};
+// Desk frame legs
+box(0.1,1.5,0.1,MAT.desk,2.65,0.75,-0.6);
+box(0.1,1.5,0.1,MAT.desk,4.35,0.75,-0.6);
+box(0.1,1.5,0.1,MAT.desk,2.65,0.75,1.0);
+box(0.1,1.5,0.1,MAT.desk,4.35,0.75,1.0);
+// Desk lower shelf
+box(3.8,0.08,1.8,MAT.desk,3.5,0.9,0.2);
+// Rack unit under desk
+var rack=box(1.8,0.5,1.4,MAT.rack,3.5,0.3,0.2);
+
+// iMac monitor
+var mon=box(1.6,1.0,0.05,MAT.monitor,3.5,2.12,-0.55);
+mon.userData={panelId:'music',label:'DAW & Music'};
+// Screen (glowing orange DAW)
+var scr=box(1.4,0.85,0.02,MAT.screen,3.5,2.15,-0.52);
+scr.userData={panelId:'music',label:'DAW & Music'};
+// Monitor base
+box(0.6,0.08,0.3,MAT.monitor,3.5,1.55,-0.55);
+box(0.08,0.5,0.08,MAT.monitor,3.5,1.8,-0.6);
+
+// KRK Rokit speakers (yellow cone) LEFT
+var spkL=box(0.42,0.55,0.38,MAT.speaker,2.45,1.85,-0.5);
+spkL.userData={panelId:'music',label:'KRK Monitors'};
+cyl(0.13,0.13,0.05,16,MAT.speakerCone,2.45,1.85,-0.3);
+// KRK RIGHT
+var spkR=box(0.42,0.55,0.38,MAT.speaker,4.55,1.85,-0.5);
+spkR.userData={panelId:'music',label:'KRK Monitors'};
+cyl(0.13,0.13,0.05,16,MAT.speakerCone,4.55,1.85,-0.3);
+
+// Keyboard (MIDI) on desk
+var kb=box(2.2,0.1,0.5,MAT.kb,3.5,1.62,0.55);
+kb.userData={panelId:'music',label:'MIDI Keyboard'};
+// White keys suggestion
+for(var k=0;k<7;k++){box(0.25,0.08,0.44,MAT.kbKey,2.48+k*0.35,1.67,0.55);}
+
+// Producer chair
+var chairBase=box(0.8,0.1,0.8,MAT.chairSeat,3.0,1.15,1.2);
+chairBase.userData={panelId:'music',label:'Producer Chair'};
+cyl(0.06,0.06,1.1,8,MAT.micStand,3.0,0.6,1.2);
+box(0.1,0.1,0.1,MAT.chair,3.0-0.35,0.05,1.2);
+box(0.1,0.1,0.1,MAT.chair,3.0+0.35,0.05,1.2);
+box(0.1,0.1,0.1,MAT.chair,3.0-0.35,0.05,1.2+0.35);
+box(0.1,0.1,0.1,MAT.chair,3.0+0.35,0.05,1.2+0.35);
+// Seat back
+box(0.8,0.9,0.1,MAT.chair,3.0,1.65,-0.24+1.2);
+
+// Second chair (right of desk)
+box(0.7,0.1,0.7,MAT.chairSeat,5.2,1.0,1.0);
+cyl(0.05,0.05,1.0,8,MAT.micStand,5.2,0.5,1.0);
+box(0.08,0.08,0.08,MAT.chair,5.2-0.3,0.05,1.0);
+box(0.08,0.08,0.08,MAT.chair,5.2+0.3,0.05,1.0);
+box(0.08,0.08,0.08,MAT.chair,5.2-0.3,0.05,1.0+0.3);
+box(0.08,0.08,0.08,MAT.chair,5.2+0.3,0.05,1.0+0.3);
+
+// ── MIC STAND (center) ──────────────────────────────────────────────────────
+var micBase=cyl(0.2,0.22,0.04,12,MAT.micStand,0.5,0.02,0.0);
+var micPole=cyl(0.03,0.03,1.6,8,MAT.micStand,0.5,0.85,0.0);
+var micPole2=cyl(0.02,0.02,0.8,8,MAT.micStand,0.5,1.6+0.4,-0.15);
+micPole2.rotation.x=0.3;
+// Mic head
+var micHead=box(0.14,0.28,0.14,MAT.mic,0.5,1.95,-0.3);
+micHead.userData={panelId:'mic',label:'Recording Booth'};
+// pop filter
+cyl(0.18,0.18,0.02,16,MAT.curtain,0.5,1.95,-0.1);
+
+// ── COUCH (left wall) ───────────────────────────────────────────────────────
+var couchMain=box(3.2,0.5,1.2,MAT.couch,-4.5,0.4,1.0);
+couchMain.userData={panelId:'about',label:'About Esency'};
+box(3.2,0.8,0.2,MAT.couch,-4.5,0.8,0.45); // back
+box(0.2,0.8,1.2,MAT.couch,-3.0,0.8,1.0);  // arm left
+box(0.2,0.8,1.2,MAT.couch,-6.0,0.8,1.0);  // arm right
+// pillows
+box(0.7,0.4,0.25,MAT.couchPillow,-3.8,0.85,0.65);
+box(0.7,0.4,0.25,MAT.couchPillow,-5.2,0.85,0.65);
+
+// ── TORCHIERE LAMP ──────────────────────────────────────────────────────────
+cyl(0.04,0.04,2.2,8,MAT.micStand,-2.8,1.1,0.0);
+cyl(0.22,0.08,0.3,12,MAT.lamp,-2.8,2.3,0.0);
+cyl(0.12,0.12,0.02,12,MAT.lampLight,-2.8,2.46,0.0);
+cyl(0.1,0.12,0.08,12,MAT.micStand,-2.8,0.04,0.0);
+
+// ── GUITARS on left wall ─────────────────────────────────────────────────────
+// Guitar 1 (leaning on wall)
+var g1body=box(0.35,0.7,0.1,MAT.guitarBody,-6.6,3.2,-2.5);
+g1body.userData={panelId:'guitar',label:'Guitars'};
+g1body.rotation.z=0.15;
+box(0.12,1.1,0.08,MAT.guitar,-6.65,3.8,-2.5); // neck
+box(0.22,0.18,0.08,MAT.guitar,-6.6,4.4,-2.5); // headstock
+
+// Guitar 2
+var g2body=box(0.32,0.65,0.1,MAT.guitarBody,-6.6,3.0,-1.4);
+g2body.userData={panelId:'guitar',label:'Guitars'};
+g2body.rotation.z=-0.1;
+box(0.1,1.0,0.07,MAT.guitar,-6.55,3.55,-1.4);
+box(0.2,0.16,0.07,MAT.guitar,-6.52,4.08,-1.4);
+
+// ── ACOUSTIC PANELS (left wall upright) ─────────────────────────────────────
+box(0.08,2.0,0.9,MAT.foam,-6.88,2.5,-3.5);
+box(0.08,2.0,0.9,MAT.foam,-6.88,2.5,-1.8);
+
+// ── POSTERS (right wall) ────────────────────────────────────────────────────
+var p1=box(0.04,1.0,0.7,MAT.poster,6.88,3.5,-3.0);
+p1.userData={panelId:'about',label:'Esency Poster'};
+box(0.04,0.8,0.55,MAT.poster,6.88,3.2,-1.5);
+
+// ── CEILING LIGHT ────────────────────────────────────────────────────────────
+cyl(0.25,0.25,0.1,16,MAT.lamp,1.0,5.9,-0.5);
+cyl(0.18,0.18,0.04,16,MAT.lampLight,1.0,5.84,-0.5);
+
+// ── LIGHTING ─────────────────────────────────────────────────────────────────
+// Ambient (very low)
+scene.add(new THREE.AmbientLight(0x111111,0.6));
+
+// Warm torch lamp (orange-amber)
+var lampPt=new THREE.PointLight(0xff8833,2.2,10);
+lampPt.position.set(-2.8,2.5,0);
+lampPt.castShadow=true;
+scene.add(lampPt);
+
+// Cool ceiling fill
+var ceilPt=new THREE.PointLight(0xaaccff,1.2,14);
+ceilPt.position.set(1,5.6,-0.5);
+scene.add(ceilPt);
+
+// Screen glow (orange)
+var screenGlow=new THREE.PointLight(0xff6600,0.8,4);
+screenGlow.position.set(3.5,2.2,-0.4);
+scene.add(screenGlow);
+
+// KRK speaker glow (yellow-green)
+var krkGlow=new THREE.PointLight(0xdddd00,0.5,3);
+krkGlow.position.set(4.55,1.9,-0.3);
+scene.add(krkGlow);
+
+// Directional (sun-like, top)
+var dir=new THREE.DirectionalLight(0xffffff,0.9);
+dir.position.set(6,10,6);
+dir.castShadow=true;
+dir.shadow.mapSize.width=2048;
+dir.shadow.mapSize.height=2048;
+scene.add(dir);
+
+// ── CLICKABLE OBJECTS ─────────────────────────────────────────────────────────
+var clickables=[];
+scene.traverse(function(obj){
+  if(obj.userData&&obj.userData.panelId)clickables.push(obj);
+});
+
+// ── RAYCASTER ─────────────────────────────────────────────────────────────────
+var raycaster=new THREE.Raycaster();
+var mouse=new THREE.Vector2();
+var tooltip=document.getElementById('tooltip');
+var hovered=null;
+
+function getIntersects(event){
+  var rect=renderer.domElement.getBoundingClientRect();
+  mouse.x=((event.clientX-rect.left)/rect.width)*2-1;
+  mouse.y=-((event.clientY-rect.top)/rect.height)*2+1;
+  raycaster.setFromCamera(mouse,camera);
+  return raycaster.intersectObjects(clickables,false);
+}
+
+window.addEventListener('mousemove',function(e){
+  var hits=getIntersects(e);
+  if(hits.length>0){
+    var obj=hits[0].object;
+    if(obj.userData.label){
+      tooltip.textContent=obj.userData.label;
+      tooltip.style.left=(e.clientX+14)+'px';
+      tooltip.style.top=(e.clientY-10)+'px';
+      tooltip.style.opacity='1';
+      document.body.style.cursor='pointer';
+      hovered=obj;
+    }
+  } else {
+    tooltip.style.opacity='0';
+    document.body.style.cursor='default';
+    hovered=null;
+  }
+});
+
+window.addEventListener('click',function(e){
+  var hits=getIntersects(e);
+  if(hits.length>0){
+    var obj=hits[0].object;
+    if(obj.userData.panelId) openPanel(obj.userData.panelId);
+  }
+});
+
+// ── GENTLE CAMERA DRIFT ───────────────────────────────────────────────────────
+var t=0;
+function animate(){
+  requestAnimationFrame(animate);
+  t+=0.004;
+  // very subtle float — keeps it cinematic
+  camera.position.x=12+Math.sin(t*0.6)*0.3;
+  camera.position.y=12+Math.sin(t*0.4)*0.2;
+  camera.lookAt(0,1,0);
+  renderer.render(scene,camera);
+}
+
+// ── RESIZE ────────────────────────────────────────────────────────────────────
+window.addEventListener('resize',function(){
+  W=window.innerWidth;H=window.innerHeight;
+  aspect=W/H;
+  camera.left=-viewSize*aspect;
+  camera.right=viewSize*aspect;
+  camera.updateProjectionMatrix();
+  renderer.setSize(W,H);
+});
+
+// ── LOADING ───────────────────────────────────────────────────────────────────
+var bar=document.getElementById('loading-bar');
+var pct=0;
+var loadInterval=setInterval(function(){
+  pct+=8;
+  bar.style.width=Math.min(pct,100)+'%';
+  if(pct>=100){
+    clearInterval(loadInterval);
+    setTimeout(function(){
+      var ld=document.getElementById('loading');
+      ld.style.opacity='0';
+      setTimeout(function(){ld.style.display='none';},600);
+    },300);
+  }
+},80);
+
+animate();
+</script>
 </body>
 </html>
